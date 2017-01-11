@@ -1,0 +1,27 @@
+{% extends "base_login.html" %}
+{% load rest_framework %}
+{% block content%}
+
+<div class="row">
+   		<div class="col-lg-offset-4 col-lg-4" style="margin-top:100px">
+   			<div class="block-unit" style="text-align:center; padding:8px 8px 8px 8px;">
+   				<img src="images/face80x80.jpg" alt="" class="img-circle">
+   				<br>
+   				<br>
+				<form class="cmxform" action="/auth/signin/" method="post" novalidate>
+				    {% csrf_token %}
+				    {% for key, value in errors.items %}
+					    {% if key == 'non_field_errors'%}
+					    	<p>{{ value }}</p>
+					    {% endif %}
+				    {% endfor %}
+				    {% render_form serializer template_pack='rest_framework/vertical' %}
+				    <button type="submit" class="submit btn-success btn btn-large">Sign in</button>
+				</form>
+   			</div>
+
+   		</div>
+</div>
+
+
+{% endblock %}
