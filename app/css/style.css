@@ -1,0 +1,34 @@
+label.radio {
+	display: inline-block;
+	margin: 0 10px;
+}
+
+/* US-PREFERENCE  STYLES STARTS */
+
+.clear{
+	clear: both;
+}
+
+.usp_radio{
+	margin-left: 30px;
+}
+
+.usp_radio .form-group .controls .radio {
+	width: 240px;
+}
+/* US-PREFERENCE  STYLES ENDS */
+
+/* Company_Name Field  STYLES STARTS */
+
+#id_company_name{
+	width:475px;
+}
+
+/* Company_Name Field  STYLES ENDS */
+.controls{
+	width: 100%;
+	margin-left: 127px;
+	}
+.progress{
+	display:none;
+}
