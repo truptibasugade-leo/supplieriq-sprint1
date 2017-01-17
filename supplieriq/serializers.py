@@ -19,6 +19,7 @@ from django.core.validators import RegexValidator
 from django.core.paginator import Page
 from django.core.serializers.json import DjangoJSONEncoder
 import logging
+from supplieriq.models import Vendors,Company
 
 logger = logging.getLogger('file_debug_log')
 
@@ -78,3 +79,22 @@ class SignInSerializer(serializers.Serializer):
 #             
 
         return attrs
+
+class VendorSerializer(serializers.Serializer):
+
+    """
+    Used for indexing only.
+    """
+    name = serializers.CharField(read_only=True)
+#     company = serializers.PrimaryKeyRelatedField(read_only=True)
+    
+    address = serializers.CharField(read_only=True)
+    phone = serializers.CharField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+    
+    class Meta(object):
+        model = Vendors
+        fields = (
+            'name', 'phone', 'email',
+        )
+
