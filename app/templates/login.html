@@ -1,27 +1,43 @@
-{% extends "base_login.html" %}
+{% extends "base.html" %}
+{% load static %}
 {% load rest_framework %}
 {% block content%}
 
 <div class="row">
-   		<div class="col-lg-offset-4 col-lg-4" style="margin-top:100px">
-   			<div class="block-unit" style="text-align:center; padding:8px 8px 8px 8px;">
-   				<img src="images/face80x80.jpg" alt="" class="img-circle">
-   				<br>
-   				<br>
-				<form class="cmxform" action="/auth/signin/" method="post" novalidate>
-				    {% csrf_token %}
-				    {% for key, value in errors.items %}
-					    {% if key == 'non_field_errors'%}
-					    	<p>{{ value }}</p>
-					    {% endif %}
-				    {% endfor %}
-				    {% render_form serializer template_pack='rest_framework/vertical' %}
-				    <button type="submit" class="submit btn-success btn btn-large">Sign in</button>
-				</form>
-   			</div>
-
+		<div class="mainbox col-md-4 col-md-offset-1 col-sm-12 login-container" style="margin-top:100px">
+   			<h1 class="media-heading siq_bold">
+		       Log in
+		    </h1>	<br><br>
+		    <div class="panel panel-info">	  
+		    <div class="siq_left_info_box siq_form_border col-sm-12 col-xs-12">   
+		       	<div class="slide">	
+		       		<div style="display:block" class="panel-body" id="formContent">
+						<form class="form-horizontal" action="/" method="post" novalidate >
+							<div>
+						    {% csrf_token %}
+						    
+						    {% for key, value in errors.items %}
+							    {% if key == 'non_field_errors'%}
+							    <div class="form_errors">
+							    	<div class="form_error_message">
+							    	{{ value }}
+							    	</div>
+							    </div>
+							    	
+							    {% endif %}
+						    {% endfor %}
+						    {% render_form serializer %}
+						    <br>
+						    <div class="form-group">						        
+						        <button type="submit" class="btn btn-primary btn btn-success col-md-offset-3">Sign in</button>						        
+						    </div>
+						    </div>
+						</form>
+					</div>
+				</div>
+			</div>
+			</div>
    		</div>
 </div>
-
 
 {% endblock %}
