@@ -15,9 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
- 
+from supplieriq import views
+from rest_framework import routers
+router = routers.DefaultRouter()
+
+# router.register(r'vendors', views.VendorsAPI, base_name="vendors")
 
 urlpatterns = [
-    url(r'^auth/', include('supplieriq.urls')),
+    url(r'^', include('supplieriq.urls')),
     url(r'^admin/', admin.site.urls),
 ]
+urlpatterns += router.urls
