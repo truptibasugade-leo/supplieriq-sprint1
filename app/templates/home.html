@@ -2,7 +2,7 @@
 {% load rest_framework %}
 {% block content%}
 <div class="siq_company_heading siq_welcome siq_dashboard_heading" ng-controller="VendorController">
-	<div class="container" ng-show="current_tab == 'home' || current_tab == ''">
+	<div class="container">
 		<div class="row" >
 			<div class="col-md-9">
 				<h1 class="media-heading">Welcome, <span class="siq_bold">{{request.user.username}}</span>.</h1>
