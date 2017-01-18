@@ -31,11 +31,11 @@ label.radio {
 @font-face {
   font-family: "Century Gothic W01";
   src: url("CenturyGothicW01.eot?#iefix");
-  src: url("CenturyGothicW01.eot?#iefix") format("eot"), url("CenturyGothicW01.woff") format("woff"), url("CenturyGothicW01.ttf") format("truetype"), url("CenturyGothicW01.svg#CenturyGothicW01") format("svg"); }
+  src: url("CenturyGothicW01.eot?#iefix") format("eot"), url("../font-awesome/fonts/CenturyGothicW01.woff") format("woff"), url("../font-awesome/fonts/CenturyGothicW01.ttf") format("truetype"), url("../font-awesome/fonts/CenturyGothicW01.svg#CenturyGothicW01") format("svg"); }
 @font-face {
   font-family: "Century Gothic W01 Bold";
-  src: url("CenturyGothicW01bold.eot?#iefix");
-  src: url("CenturyGothicW01bold.eot?#iefix") format("eot"), url("CenturyGothicW01bold.woff") format("woff"), url("CenturyGothicW01bold.ttf") format("truetype"), url("CenturyGothicW01bold.svg#CenturyGothicW01bold") format("svg"); }
+  src: url("../font-awesome/fonts/CenturyGothicW01bold.eot?#iefix");
+  src: url("../font-awesome/fonts/CenturyGothicW01bold.eot?#iefix") format("eot"), url("../font-awesome/fonts/CenturyGothicW01bold.woff") format("woff"), url("../font-awesome/fonts/CenturyGothicW01bold.ttf") format("truetype"), url("../font-awesome/fonts/CenturyGothicW01bold.svg#CenturyGothicW01bold") format("svg"); }
 
 body {
   font-family: "Century Gothic W01";
