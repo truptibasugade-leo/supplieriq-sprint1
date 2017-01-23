@@ -2,7 +2,7 @@ development/logs/*
 development/static/*
 development/settings.py
 *.pyc
-supplieriq/__init__.*
-development/__init__.*
+supplieriq/__init__.pyc
+development/__init__.pyc
 supplieriq/migrations/*
 env/*
