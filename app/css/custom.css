@@ -14,3 +14,18 @@
 .login-container .form-group .btn-success{
 	margin: 0 0 0 28%;
 }
+
+.pagination > .active > a, .pagination > .active > a:focus,
+ .pagination > .active > a:hover,
+ .pagination > .active > span,
+ .pagination > .active > span:focus,
+ .pagination > .active > span:hover{
+background-color: #806B23;
+border-color: #806B23;
+}
+
+.pagination > li > a, 
+.pagination > li > a:hover ,
+.pagination > li > span{
+	color: #806B23;
+}

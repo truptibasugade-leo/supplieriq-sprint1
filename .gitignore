@@ -1,8 +1,10 @@
 development/logs/*
 development/static/*
 development/settings.py
-*.pyc
+development/*.pyc
+supplieriq/*.pyc
 supplieriq/__init__.pyc
 development/__init__.pyc
 supplieriq/migrations/*
 env/*
+development/wsgi.py

@@ -16,12 +16,19 @@
 		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
 		
 		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
-		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}" />
-		<script src="{% static 'js/jquery.js' %}"></script>
 		
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">		
+		
+		<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script> 
+		<script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script> 
+  
+ 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css"> 
+		
+		
+		<!-- <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script> -->
 		<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="{% static 'css/style_inside.css' %}" />
-		<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 		
 		
 		<!-- <script src="{% static 'js/angular.min.js' %}"></script>
@@ -30,15 +37,14 @@
 	    <script src="{% static 'js/supplieriqApp/supplieriqModule.js' %}"></script>
 	    <script src="{% static 'js/supplieriqApp/main.resource.js' %}"></script>
 	    <script src="{% static 'js/supplieriqApp/main.controller.js' %}"></script> -->
-		
 
 		<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}" />
 		
 		{% block js %}{% endblock %}
 	</head>
 
-	<body ng-app="supplieriqApp">
-		<div id="siq_main_body" ng-controller="VendorController">
+	<body>
+		<div id="siq_main_body">
 			<header>
 				{% include "navigation.html" %}
 			</header>

@@ -55,24 +55,27 @@ class ObtainAuthToken(APIView):
     
     # Accepte un backend en parametre : 'auth' pour un login / pass classique
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)        
+        serializer = self.serializer_class(data=request.data)       
         if serializer.is_valid():
             user = serializer.instance            
             token, created = Token.objects.get_or_create(user=user)  
 #             auth_login(request, user)
             new_user = authenticate(username=user.username, password=request.data.get('password'))
             auth_login(request, new_user)
-            response = Response({'serializer':serializer,'token': token.key,
+            response = Response({'serializer':serializer.data,'token': token.key,
                                  'userid': user.id,
-#                                  'redirect_url': redirect_url,
             }, template_name='home.html')
 #             response.set_cookie('authorization', token.key, max_age=MAX_AGE, expires=EXPIRES)
 #             response.set_cookie('authenticate', token.key, max_age=MAX_AGE, expires=EXPIRES)        
         else:
             #self.mix_panel_login(request, request.DATA, False)
-            response = Response({'serializer':serializer,
-                'errors':serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
-        
+            try:
+                #for website
+                x = request.data['csrfmiddlewaretoken'] 
+                response = Response({'serializer':serializer,'errors':serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+            except:
+                # for API
+                response = Response({'errors':serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
         return response
 
 class SignoutUser(APIView):
