@@ -31,8 +31,7 @@ from django.shortcuts import render_to_response
 class ObtainAuthToken(APIView):
 
     """
-    Constraints:
-    This API is not for mobile Team.
+    This API is used to authenticated the user with provided credentials.
     """
 
     throttle_classes = ()
@@ -53,13 +52,11 @@ class ObtainAuthToken(APIView):
         
         return Response({'serializer': serializer})
     
-    # Accepte un backend en parametre : 'auth' pour un login / pass classique
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)       
         if serializer.is_valid():
             user = serializer.instance            
             token, created = Token.objects.get_or_create(user=user)  
-#             auth_login(request, user)
             new_user = authenticate(username=user.username, password=request.data.get('password'))
             auth_login(request, new_user)
             response = Response({'serializer':serializer.data,'token': token.key,
@@ -68,7 +65,6 @@ class ObtainAuthToken(APIView):
 #             response.set_cookie('authorization', token.key, max_age=MAX_AGE, expires=EXPIRES)
 #             response.set_cookie('authenticate', token.key, max_age=MAX_AGE, expires=EXPIRES)        
         else:
-            #self.mix_panel_login(request, request.DATA, False)
             try:
                 #for website
                 x = request.data['csrfmiddlewaretoken'] 
@@ -81,8 +77,7 @@ class ObtainAuthToken(APIView):
 class SignoutUser(APIView):
 
     """
-    Constraints:
-    This API is not for mobile Team.
+    This API is used to logout the authenticatde user.
     """
 
     throttle_classes = ()
@@ -101,13 +96,12 @@ class SignoutUser(APIView):
             auth_logout(request)
         
         return Response({'serializer': serializer})
-    
-    
+        
 # class VendorsAPI(viewsets.ModelViewSet):
 class VendorsAPI(APIView):
     """
-    Constraints:
-    This API is not for mobile Team.
+    This API is used to render template having Vendor list or 
+    if query parameter like 'id' is sent the it will render Vendor details
     """
     
 #     serializer_class = VendorSerializer  # AuthTokenSerializer
@@ -137,20 +131,19 @@ class VendorsAPI(APIView):
         serializer = self.get_serializer(self.object_list, many=True)
         return Response(serializer.data)
     
-    '''
-        
+    '''        
         
 class ItemsAPI(APIView):
     """
-    Constraints:
-    This API is not for mobile Team.
+    This API is used to render template having Item list or 
+    if query parameter like 'id' is sent the it will render Item details
     """
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):
         try:
-            vendor_id = request.query_params['id']
-            obj = Item.objects.get(id=vendor_id)
+            item_id = request.query_params['id']
+            obj = Item.objects.get(id=item_id)
             serializer = ItemSerializer(obj)    
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
