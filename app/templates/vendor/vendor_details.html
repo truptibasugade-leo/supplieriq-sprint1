@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% load generic_tags %}
+{% block content%}
+
+<div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
+	<div class="container">
+		<div class="row">
+			<div class="siq_left_info_box siq_form_border  col-sm-6 col-md-offset-3 col-lg-6"> 
+				<h4><strong>Vendor Details</strong></h4><br/>
+				<div>
+					{% for key, value in serializer.items%}
+						{% if key != 'vendorid' %}
+						<div>
+							<div class="form-group ">
+								<label>{% format_label key%} : </label>
+								<input type="text" class="form-control" value="{{value}}" readonly><br/>
+							</div>
+						<div><br/>
+						{% endif %}
+					{% endfor %}
+				</div>
+				</div>
+			</div>
+		 </div>
+	</div> 
+</div>
+{% endblock %}
+
