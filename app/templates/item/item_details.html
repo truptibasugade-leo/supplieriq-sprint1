@@ -15,11 +15,13 @@
 							<div class="form-group ">
 								<label>{% format_label key%} : </label>
 								{% if key == 'vendor' %}
+									<div class="vendor_link">
 									{% for data in value %}
 										
 											<a href="/vendors/?id={{data.vendorid}}">{{data.name}}{% if not forloop.last %},{% endif %}</a>
 										
 									{% endfor %}
+									</div>
 								{% else %}
 									<input type="text" class="form-control" value="{{value}}" readonly><br/>
 								{% endif %}
