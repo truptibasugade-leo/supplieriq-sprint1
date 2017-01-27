@@ -20,11 +20,11 @@ import time
 from django.utils.http import cookie_date
 from django.core.cache import cache
 from django.contrib.auth.models import Group
-from supplieriq.serializers import SignInSerializer,VendorSerializer
+from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import Vendors,Company
+from supplieriq.models import Vendor,Company, Item
 from django.shortcuts import render_to_response
 
 
@@ -110,24 +110,27 @@ class VendorsAPI(APIView):
     This API is not for mobile Team.
     """
     
-   # serializer_class = VendorSerializer  # AuthTokenSerializer
+#     serializer_class = VendorSerializer  # AuthTokenSerializer
 #     template_name = 'vendor_list.html'
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):
-        queryset = Vendors.objects.all()
-        renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
-        serializer = VendorSerializer(queryset, many=True)     
-        y = []
-        for x in serializer.data:
-            y.append(dict(x))
-        return Response({'serializer': y},template_name="vendor_list.html")
+        try:
+            vendor_id = request.query_params['id']
+            obj = Vendor.objects.get(id=vendor_id)
+            serializer = VendorSerializer(obj)    
+            return Response({'serializer':serializer.data},template_name="vendor/vendor_details.html")
+        except:
+            queryset = Vendor.objects.all()
+            renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+            serializer = VendorSerializer(queryset, many=True)     
+            return Response({'serializer':serializer.data},template_name="vendor/vendor_list.html")
      
     
     '''
-    model = Vendors
+    model = Vendor
     serializer_class = VendorSerializer
     template_name = 'vendor_list.html'
-    queryset =  Vendors.objects.all()
+    queryset =  Vendor.objects.all()
 
     def list(self, request, *args, **kwargs):
         self.object_list = self.filter_queryset(self.get_queryset())
@@ -135,3 +138,25 @@ class VendorsAPI(APIView):
         return Response(serializer.data)
     
     '''
+        
+        
+class ItemsAPI(APIView):
+    """
+    Constraints:
+    This API is not for mobile Team.
+    """
+    
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    def get(self, request,*args, **kwargs):
+        try:
+            vendor_id = request.query_params['id']
+            obj = Item.objects.get(id=vendor_id)
+            serializer = ItemSerializer(obj)    
+            return Response({'serializer':serializer.data},template_name="item/item_details.html")
+        except:
+            queryset = Item.objects.all()
+            renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+#             import ipdb;ipdb.set_trace()
+            serializer = ItemSerializer(queryset, many=True)     
+            return Response({'serializer':serializer.data},template_name="item/item_list.html")
+     

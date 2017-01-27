@@ -19,7 +19,7 @@ from django.core.validators import RegexValidator
 from django.core.paginator import Page
 from django.core.serializers.json import DjangoJSONEncoder
 import logging
-from supplieriq.models import Vendors,Company
+from supplieriq.models import Vendor,Company
 
 logger = logging.getLogger('file_debug_log')
 
@@ -85,16 +85,40 @@ class VendorSerializer(serializers.Serializer):
     """
     Used for indexing only.
     """
+    vendorid = serializers.SerializerMethodField('get_vendor_id')
     name = serializers.CharField(read_only=True)
 #     company = serializers.PrimaryKeyRelatedField(read_only=True)
-    
+    erp_vendor_code = serializers.CharField(read_only=True)
     address = serializers.CharField(read_only=True)
     phone = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
     
     class Meta(object):
-        model = Vendors
+        model = Vendor
         fields = (
-            'name', 'phone', 'email',
+            'vendorid','name', 'erp_vendor_code','phone','address', 'email',
         )
+    
+    def get_vendor_id(self, obj):
+        return obj.id;
+    
+class ItemSerializer(serializers.Serializer):
 
+    """
+    Used for indexing only.
+    """
+    itemid = serializers.SerializerMethodField('get_item_id')
+    name = serializers.CharField(read_only=True)
+    erp_item_code = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    vendor = VendorSerializer(read_only=True, many=True)
+    
+    class Meta(object):
+        model = Vendor
+        fields = (
+            'itemid','name', 'erp_item_code','description',
+        )
+    
+    def get_item_id(self, obj):
+        return obj.id;
+    

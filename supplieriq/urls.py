@@ -11,4 +11,6 @@ urlpatterns = [
         name='signout'),
     url(r'^vendors', views.VendorsAPI.as_view(),
         name='vendors'),
+    url(r'^items', views.ItemsAPI.as_view(),
+        name='items'),
 ]

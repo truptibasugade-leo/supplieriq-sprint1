@@ -29,3 +29,18 @@ border-color: #806B23;
 .pagination > li > span{
 	color: #806B23;
 }
+
+.v_id{
+	display: none;
+}
+.form-group label{
+	width: 40%;
+}
+.form-group input[type="text"].form-control{
+	display: inline-block;
+	width:50%;
+	margin: 8px;
+}
+.i_id{
+	display: none;
+}

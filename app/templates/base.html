@@ -31,19 +31,18 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'css/style_inside.css' %}" />
 		
 		
-		<!-- <script src="{% static 'js/angular.min.js' %}"></script>
+		<script src="{% static 'js/angular.min.js' %}"></script>
 		<script src="{% static 'js/angular-resource.js' %}"></script>
 		<script src="{% static 'js/angular-route.js' %}"></script>
 	    <script src="{% static 'js/supplieriqApp/supplieriqModule.js' %}"></script>
 	    <script src="{% static 'js/supplieriqApp/main.resource.js' %}"></script>
-	    <script src="{% static 'js/supplieriqApp/main.controller.js' %}"></script> -->
-
+	    <script src="{% static 'js/supplieriqApp/main.controller.js' %}"></script> 
 		<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}" />
 		
 		{% block js %}{% endblock %}
 	</head>
 
-	<body>
+	<body ng-app="supplieriqApp">
 		<div id="siq_main_body">
 			<header>
 				{% include "navigation.html" %}

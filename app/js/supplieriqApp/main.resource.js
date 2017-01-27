@@ -42,6 +42,9 @@
         function($resource) {
             return $resource('/vendors/ ', {}, actions);
         }]);
+    app.factory('GetVendorDetails', ['$resource',function($resource) {
+          return $resource('/vendors/?id=:id', {id:'@id'}, actions);
+      }]);
     
 
 }).call(this);
