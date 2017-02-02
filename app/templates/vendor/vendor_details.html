@@ -6,24 +6,39 @@
 <div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
 	<div class="container">
 		<div class="row">
-			<div class="siq_left_info_box siq_form_border  col-sm-6 col-md-offset-3 col-lg-6"> 
-				<h4><strong>Vendor Details</strong></h4><br/>
-				<div>
+			<h3><strong>Vendor</strong></h3>
+			
+			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
+				{% for key, value in serializer.items%}
+					{% if key == 'name' %}
+						<span><h4>{{value}}</h4></span><br/>
+					{% endif %}
+				{% endfor %}	
+				<div class="vendorLabel"><b>Primary Information</b></div>			
+				<div class="vendorInfo row">
 					{% for key, value in serializer.items%}
-						{% if key != 'vendorid' %}
-						<div>
-							<div class="form-group ">
-								<label>{% format_label key%} : </label>
-								<input type="text" class="form-control" value="{{value}}" readonly><br/>
-							</div>
-						<div><br/>
+						{% if key == 'erp_vendor_code' or key == 'company' or key == 'name'%}
+						<div class="col-sm-6">
+							<label>{% format_label key%}  </label><br/>
+							<span class="vendorDetail">{{value}}</span><br/>
+						</div>
 						{% endif %}
 					{% endfor %}
 				</div>
+				<div class="vendorLabel"><b>Email | Phone | Address </b></div>
+				<div class="vendorInfo row">
+					{% for key, value in serializer.items%}
+						{% if key == 'email' or key == 'phone' or key == 'address'%}
+						<div class="col-sm-6">
+							<label>{% format_label key%}  </label><br/>
+							<span class="vendorDetail">{{value}}</span><br/>
+						</div>
+						{% endif %}
+					{% endfor %}
 				</div>
 			</div>
-		 </div>
-	</div> 
-</div>
+		</div>
+	 </div>
+</div> 
 {% endblock %}
 

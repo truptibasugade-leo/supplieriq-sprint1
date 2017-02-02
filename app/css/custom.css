@@ -36,11 +36,6 @@ border-color: #806B23;
 .form-group label{
 	width: 40%;
 }
-.form-group input[type="text"].form-control{
-	display: inline-block;
-	width:50%;
-	margin: 8px;
-}
 .i_id{
 	display: none;
 }
@@ -48,4 +43,26 @@ border-color: #806B23;
 .vendor_link{
 	width: 50%;
     display: inline-block;
+}
+.vendorLabel{
+	background-color: #CCBA7C;
+	padding: 2px 15px;
+	border-radius: 3px;
+}
+.vendorDetail{
+	height: 34px;
+	font-size: 14px;
+	line-height: 1.42857;
+	color: #555;
+	background-image: none;	
+	opacity: 1;
+}
+.vendorInfo{
+	padding: 20px 15px;
+}
+.vendorInfo div{
+	padding: 15px;
+}
+.vendorInfo #example1_wrapper div{
+	padding: 1px;
 }

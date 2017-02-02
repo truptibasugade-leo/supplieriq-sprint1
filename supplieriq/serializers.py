@@ -87,7 +87,7 @@ class VendorSerializer(serializers.Serializer):
     """
     vendorid = serializers.SerializerMethodField('get_vendor_id')
     name = serializers.CharField(read_only=True)
-#     company = serializers.PrimaryKeyRelatedField(read_only=True)
+    company = serializers.SerializerMethodField('get_company_name')
     erp_vendor_code = serializers.CharField(read_only=True)
     address = serializers.CharField(read_only=True)
     phone = serializers.CharField(read_only=True)
@@ -96,11 +96,14 @@ class VendorSerializer(serializers.Serializer):
     class Meta(object):
         model = Vendor
         fields = (
-            'vendorid','name', 'erp_vendor_code','phone','address', 'email',
+            'vendorid','name', 'erp_vendor_code','phone', 'email','company',
         )
     
     def get_vendor_id(self, obj):
         return obj.id;
+    
+    def get_company_name(self, obj):
+        return obj.company.name;
     
 class ItemSerializer(serializers.Serializer):
 

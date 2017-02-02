@@ -19,7 +19,7 @@ $(document).ready(function() {
 							<th>Name</th>
 							<th>Item Code</th>
 							<th>description</th>
-							<th>Vendor</th>							
+							<th class="v_id">Vendor</th>							
 						</tr>
 					</thead>
 					<tbody>
@@ -31,7 +31,7 @@ $(document).ready(function() {
 								{% elif key == 'itemid'%}
 									<td class="i_id">{{value}}</td>	
 								{% elif key == 'vendor'%}
-									<td>
+									<td class="i_id">
 									{% for d in value %}									
 										<span><a href="/vendors/?id={{d.vendorid}}">{{d.name}}{% if not forloop.last %},{% endif %}</a></span>																			
 									{% endfor%}
