@@ -29,10 +29,17 @@
 				<div class="vendorInfo row">
 					{% for key, value in serializer.items%}
 						{% if key == 'email' or key == 'phone' or key == 'address'%}
-						<div class="col-sm-6">
-							<label>{% format_label key%}  </label><br/>
-							<span class="vendorDetail">{{value}}</span><br/>
-						</div>
+							{% if key == 'address' %}
+							<div class="col-sm-6">
+								<label>{% format_label key%}  </label><br/>
+								<span class="vendorDetail">{{value|linebreaksbr}}</span><br/>
+							</div>
+							{% else %}
+							<div class="col-sm-6">
+								<label>{% format_label key%}  </label><br/>
+								<span class="vendorDetail">{{value}}</span><br/>
+							</div>
+							{% endif %}
 						{% endif %}
 					{% endfor %}
 				</div>

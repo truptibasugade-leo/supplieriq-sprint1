@@ -13,6 +13,86 @@
 			</div>
 		</div>
 	</div>
+	
+	<div class="container siq_dashboard">
+		<div class="row">
+			<div class="col-md-4">
+				<div class="siq_dash_node">			
+					<h2>1. Your company<BR/>&nbsp;</h2>
+					<p>Basic stuff about your company that are important to your customers and suppliers</p>
+					<p/>
+				</div>	
+			</div>	
+			<div class="col-md-4">
+				<div class="siq_dash_node">
+					<h2>2. Vendors<BR/>&nbsp;</h2>
+					<!-- <p>See the vendor list</p>				 -->	
+					<p/>
+					<div style="height: 56px;" class="panel-footer row">
+						<div class="col-xs-12">
+							<div class="dash_link_container">							
+								<a class="dash_link pull-right" href="/vendors/">								
+								Vendor List <span class="glyphicon glyphicon-arrow-right"></span></a>
+							</div>
+						</div>	
+					</div>
+				</div>
+				
+			</div>
+			<div class="col-md-4">
+				<div class="siq_dash_node">				
+					<h2>3. Items<BR/>&nbsp;</h2>
+					<!-- <p>See the item list</p> -->
+					<p/>
+					<div style="height: 56px;" class="panel-footer row">
+						<div class="col-xs-12">
+							<div class="dash_link_container">							
+								<a class="dash_link pull-right" href="/items/">								
+								Item List <span class="glyphicon glyphicon-arrow-right"></span></a>
+							</div>
+						</div>	
+					</div>
+				</div>
+			</div>		
+		</div>
+		<!-- <div class="row">
+			<div class="col-md-4">
+				<div class="siq_dash_node">						
+					<h2>Talk to folks<BR/>&nbsp;</h2>
+					<p>Talk to your partners, send a file, ask a question, have a discussion.</p>
+					<p/>
+					<h3 class="siq_go grey_lightborder"><a href="#">GO</a></h3>
+				</div>
+			</div>	
+			<div class="col-md-4">
+				<div class="siq_dash_node">						
+					<h2>Refer someone to supplier<span class="siq_bold">IQ</span><sup>&reg;</sup></h2>
+					<p>Only if you are an Economic Development Organization, you can refer some one to supplierIQ</p>
+					<h3 class="siq_go grey_lightborder"><a href="#">GO</a></h3>
+					<p/>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="siq_dash_node">					
+					<h2>Leave some feedback for us</h2>
+					<p>Your feedback is really important to us.. have problems filling your profile? Have a comment? Something is broken. We will gladly take any feedback - good or bad	</p>
+					<h3 class="siq_go grey_lightborder"><a href="#">GO</a></h3>
+				</div>
+			</div>
+		</div>	 -->
+	</div>
 </div>
-
+<script>  
+$(document).ready(function(){
+	var highest = 0;
+   	var nodes = $('.siq_dash_node');
+	nodes.each(function(){
+   		var currColumnHeight = $(this).outerHeight();
+   		if (currColumnHeight > highest) {
+     	 highest = currColumnHeight;
+   		}
+	});
+	nodes.css('height', highest);
+});
+</script>
 {% endblock %}

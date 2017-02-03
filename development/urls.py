@@ -18,6 +18,7 @@ from django.contrib import admin
 from supplieriq import views
 from rest_framework import routers
 router = routers.DefaultRouter()
+admin.autodiscover()
 
 # router.register(r'vendors', views.VendorsAPI, base_name="vendors")
 

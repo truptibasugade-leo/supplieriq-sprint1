@@ -24,7 +24,7 @@ from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSeriali
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import Vendor,Company, Item
+from supplieriq.models import Vendor,Company, Item, Address,Price,FixedCost,VariableCost,ItemVendor
 from django.shortcuts import render_to_response
 
 
@@ -141,15 +141,15 @@ class ItemsAPI(APIView):
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):
-        try:
+        try:            
             item_id = request.query_params['id']
             obj = Item.objects.get(id=item_id)
-            serializer = ItemSerializer(obj)    
+            
+            serializer = ItemSerializer(obj)                            
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
             queryset = Item.objects.all()
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
-#             import ipdb;ipdb.set_trace()
             serializer = ItemSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="item/item_list.html")
      

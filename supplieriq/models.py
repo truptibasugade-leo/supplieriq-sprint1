@@ -51,43 +51,78 @@ class Item(models.Model):
     erp_item_code = models.CharField(max_length=256, null=True, blank=True)
     description = models.CharField(max_length=20, null=True, blank=True)
     company = models.ForeignKey('Company', null=True, blank=True)  
-    vendor = models.ManyToManyField(Vendor)
+    vendor = models.ManyToManyField('Vendor')
     def __unicode__(self):
         return self.name
  
-# class Address(models.Model):
-#     """
-#     Purpose: Model for Address.
-#     """
-#     vendor = models.ForeignKey(Vendor, blank=True, null=True)
-# 
-#     address1 = models.CharField(max_length=255, null=True, blank=True)
-# 
-#     address2 = models.CharField(max_length=255, null=True, blank=True)
-# 
-#     city = models.CharField(max_length=255, null=True, blank=True)
-# 
-#     state = models.CharField(max_length=255, null=True, blank=True)
-# 
-#     country = models.CharField(max_length=255, null=True, blank=True)
-# 
-#     zipcode = models.CharField(max_length=6, null=True, blank=True)
-# 
-#     def get_address(self):
-#         """
-#         Purpose: To return string representation of address.
-#         :returns: returns verbose string for the address values.
-#         """
-#         address_list = [self.address1, self.address2, self.city, self.state,
-#                         self.country, self.zipcode]
-#         address_list = filter(None, address_list)
-#         return ', '.join(address_list)
-# 
-#     def __unicode__(self):
-#         return self.get_address()
+class Address(models.Model):
+    """
+    Purpose: Model for Address.
+    """
+    vendor = models.ForeignKey('Vendor', null=True, blank=True)
+ 
+    address1 = models.CharField(max_length=255, null=True, blank=True)
+ 
+    address2 = models.CharField(max_length=255, null=True, blank=True)
+ 
+    city = models.CharField(max_length=255, null=True, blank=True)
+ 
+    state = models.CharField(max_length=255, null=True, blank=True)
+ 
+    country = models.CharField(max_length=255, null=True, blank=True)
+ 
+    zipcode = models.CharField(max_length=6, null=True, blank=True)
+ 
+    def get_address(self):
+        """
+        Purpose: To return string representation of address.
+        :returns: returns verbose string for the address values.
+        """
+        address_list = [self.address1, self.address2, self.city, self.state,
+                        self.country, self.zipcode]
+        address_list = filter(None, address_list)
+        return ', '.join(address_list)
+ 
+    def __unicode__(self):
+        return self.get_address()
+
+
+class ItemVendor(models.Model):
+    item = models.ForeignKey('Item') 
+    vendor = models.ForeignKey('Vendor') 
+    
+    def __unicode__(self):
+        return 'Item: ' + self.item.name + ' Vendor: ' +self.vendor.name
+
+    class Meta:
+        managed = False
+        db_table = 'supplieriq_item_vendor'
+        
+
+class FixedCost(models.Model):
+    itemvendor = models.ForeignKey('ItemVendor')
+    cost_type = models.CharField(max_length=256, null=True, blank=True)
+    cost = models.CharField(max_length=256, null=True, blank=True)
+    def __unicode__(self):
+        return self.cost_type
 
     
-# class Cost(models.Model):   
-#     item_vendor = models.ForeignKey(Item, related_name="supplieriq_item_vendor")
-#     fixed_price = models.CharField(max_length=256, null=True, blank=True)
-#     variable_price = models.CharField(max_length=256, null=True, blank=True)
+class VariableCost(models.Model):
+    itemvendor = models.ForeignKey('ItemVendor')
+    quantity = models.CharField(max_length=256, null=True, blank=True)
+    cost = models.CharField(max_length=256, null=True, blank=True)
+    def __unicode__(self):
+        return 'Quantity: ' +self.quantity + ', Cost:'+self.cost
+
+
+class Price(models.Model):    
+    itemvendor = models.ForeignKey('ItemVendor')
+    fixedCost = models.ForeignKey('FixedCost')
+    variableCost = models.ForeignKey('VariableCost')
+    def __unicode__(self):
+        return 'Vendor: ' + self.itemvendor.vendor.name + \
+            ', Item:'+self.itemvendor.item.name + \
+            ', FixedCost: '+ self.fixedCost.cost_type +'- ' +self.fixedCost.cost 
+
+    
+    

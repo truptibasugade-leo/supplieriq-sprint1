@@ -24,11 +24,13 @@ $(document).ready(function() {
 							<th>Name</th>
 							<th>Company</th>
 							<th>Vendor Code</th>
+							<th>Address</th>
 							<th>Phone</th>
 							<th>Email</th>
 						</tr>
 					</thead>
-					<tbody>					
+					<tbody>				
+					{% autoescape on %}	
 					   {% for data in serializer %}						
 						<tr class="gradeA odd" >							
 							{% for key, value in data.items %}		
@@ -36,12 +38,15 @@ $(document).ready(function() {
 								<td class="vendor_name"><a href="javascript:void(0);">{{value}}</a></td>
 								{% elif key == 'vendorid'%}
 									<td class="v_id">{{value}}</td>
-								{% else %}
-								<td>{{value}}</td>
+								{% elif key == 'address' %}
+									<td>{{ value|linebreaksbr }}</td>
+								{% else %}								
+									<td>{{value}}</td>
 								{% endif %}
 							{% endfor %} 
 						</tr>
 						{% endfor %} 
+					{% endautoescape %}
 					</tbody>
 				</table>
 				</div>
