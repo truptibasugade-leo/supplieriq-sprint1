@@ -13,4 +13,6 @@ urlpatterns = [
         name='vendors'),
     url(r'^items', views.ItemsAPI.as_view(),
         name='items'),
+    url(r'^cost', views.CostAPI.as_view(),
+        name='cost'),
 ]

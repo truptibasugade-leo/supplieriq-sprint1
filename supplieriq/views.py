@@ -143,13 +143,34 @@ class ItemsAPI(APIView):
     def get(self, request,*args, **kwargs):
         try:            
             item_id = request.query_params['id']
-            obj = Item.objects.get(id=item_id)
-            
-            serializer = ItemSerializer(obj)                            
+            obj = Item.objects.get(id=item_id)            
+            serializer = ItemSerializer(obj)  
+            print serializer.data                        
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
             queryset = Item.objects.all()
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = ItemSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="item/item_list.html")
+        
+    
+class CostAPI(APIView):
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    def post(self, request,*args, **kwargs):
+        v_id = request.data.get('vendor_id')
+        i_id = request.data.get('item_id')
+        price = request.data.get('price')
+        objs=ItemVendor.objects.filter(vendor_id = v_id , item_id = i_id)     
+        price_type = request.data.get('price_type')
+        if price_type:
+            for x in objs:
+                f_c_obj = FixedCost(itemvendor=x,cost_type=price_type,cost=price)
+                f_c_obj.save()
+        else:
+            quantity = request.data.get('quantity')
+            for x in objs:
+                v_c_obj = VariableCost(itemvendor=x,quantity=quantity,cost=price)
+                v_c_obj.save()
+        return Response(json.dumps(request.data))
+    
      

@@ -201,14 +201,14 @@ class ItemSerializer(serializers.Serializer):
             x = VendorSerializer(y)
             py_dict = x.data
             fixed_cost_item = self.get_item_fixed_cost(obj,y)            
-            py_dict.update({'fixed_cost':fixed_cost_item})
+#             py_dict.update({'fixed_cost':fixed_cost_item})
             variable_cost_item = self.get_item_variable_cost(obj,y)
-            py_dict.update({'variable_cost':variable_cost_item})
+            py_dict.update({'price': [{'fixed_cost':fixed_cost_item},{'variable_cost':variable_cost_item}]})
             zz.append(py_dict)
         return zz
     def get_item_fixed_cost(self, obj,vendor_obj):
         
-        price_details = {}
+        price_details = []
         for x in obj.itemvendor_set.values():
             if x['vendor_id'] == vendor_obj.id:
                 fc_objs = FixedCost.objects.filter(itemvendor=x['id'])
@@ -216,11 +216,11 @@ class ItemSerializer(serializers.Serializer):
                 for y in fc_objs:
                     q1[y.cost_type] = y.cost
                 if q1:                 
-                    price_details['fixed_cost_'+str(x['id'])] = q1
+                    price_details.append(q1)
         return price_details; 
        
     def get_item_variable_cost(self, obj,vendor_obj):
-        price_details = {}
+        price_details = []
         for x in obj.itemvendor_set.values():
             if x['vendor_id'] == vendor_obj.id:
                 vc_objs = VariableCost.objects.filter(itemvendor=x['id'])
@@ -231,5 +231,5 @@ class ItemSerializer(serializers.Serializer):
                     q2['Cost'] = z.cost
                     vc.append(q2)
                 if vc:
-                    price_details['variable_cost_'+str(x['id'])] = vc
+                    price_details.append(vc)
         return price_details;    
