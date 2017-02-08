@@ -56,7 +56,7 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: data,
           success: function (data) {
-        	  var x = JSON.Parse(data);
+        	  var x = JSON.parse(data);
         	  $("<div class='col-sm-6'>"+x.price_type+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#f_c");
           }
         });
@@ -74,7 +74,7 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: data,
           success: function (data) {
-        	  var x = JSON.Parse(data);
+        	  var x = JSON.parse(data);
         	  $("<div class='col-sm-6'>"+x.quantity+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#v_c");
           }
         });
