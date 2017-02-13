@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% load generic_tags %}
+{% block content%}
+
+<div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
+	<div class="container">
+		<div class="row">
+			<h3><strong>Run Match</strong></h3>
+			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
+				<form class="form-horizontal" id="run_match_form">
+					<div class="row">						
+						<div class="col-sm-3">	
+							<label>Choose Item & Vendor:</label>
+							<select class="form-control" name="itemvendor">
+							{%for data in serializer%}
+							  <option value="{{data.item_vendor.itemvendor}}">Item: {{data.item.item_name}}, Vendor: {{data.vendor.vendor_name}}</option>							
+							{% endfor%}
+							</select>
+						</div>
+						<div class="col-sm-3">
+							<label>Quantity</label>	
+							<input name="quantity" class="form-control" type="text" placeholder="quantity" required></input>
+						</div>
+						<div class="col-sm-12">						        
+					        &nbsp;						        
+					    </div>
+						<div class="col-sm-6">						        
+					        <button type="submit" class="btn btn-primary btn btn-success ">Run Match</button>						        
+					    </div>
+				    </div>
+				</form>
+			</div>	
+		 </div> 
+	</div> 
+</div>
+<!-- Modal -->
+	<div id="cost_runmatch" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Price Details</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<h3>Fixed Price</h3>
+	      		<div id="f_c_cal"></div>
+	      		<h3>Variable Price</h3>
+	      		<div id="v_c_cal"></div>
+	      		<h3>Total</h3>
+	      		<div id="tot_c_cal"></div>
+	      	</div>	
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+{% endblock %}
+
