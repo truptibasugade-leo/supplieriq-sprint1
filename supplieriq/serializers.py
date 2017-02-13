@@ -232,4 +232,28 @@ class ItemSerializer(serializers.Serializer):
                     vc.append(q2)
                 if vc:
                     price_details.append(vc)
-        return price_details;    
+        return price_details; 
+
+class ItemVendorSerializer(serializers.Serializer):
+
+    """
+    Used for indexing only.
+    """
+    item_vendor = serializers.SerializerMethodField('get_item_vendor_object')
+    vendor= serializers.SerializerMethodField('get_vendor_object')
+    item = serializers.SerializerMethodField('get_item_object')
+    class Meta(object):
+        model = ItemVendor
+        fields = (
+            'item','vendor',
+        )
+    def get_item_vendor_object(self, obj):        
+        return {"itemvendor":obj.id} 
+    
+    def get_vendor_object(self, obj):        
+        return {"vendor_name":obj.vendor.name,"vendor_id": obj.vendor.id} 
+    
+    def get_item_object(self, obj):        
+        return {"item_name":obj.item.name,"item_id": obj.item.id} ; 
+
+       

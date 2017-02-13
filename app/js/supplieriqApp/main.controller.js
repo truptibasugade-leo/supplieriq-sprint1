@@ -80,4 +80,54 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
         });
 	});
 	
+	$('#run_match_form').on('submit', function (e) {
+        e.preventDefault();
+        var data = $('#run_match_form').serializeArray();
+        $.ajax({
+          type: 'get',
+          url: '/runmatch/',
+          data: data,
+          success: function (data) {
+        	  $("#f_c_cal").empty();
+        	  $("#v_c_cal").empty();
+        	  $("#tot_c_cal").empty();
+        	  try{
+        		  var x = JSON.parse(data);
+	        	  $.each(x, function(i, item) {
+	        		  
+	        		if(i == 'Variable Price' || i == 'Price (per unit)' || i == 'Total' || i == 'Fixed Price' || i == 'Quantity'){
+	        			if(i== 'Quantity' || i== 'Price (per unit)'){
+	        				$("#v_c_cal").append("<div class='col-sm-6'>"+ i +" : </div><div class='col-sm-6'>"+ item +"</div><br/>");
+	        				
+	        			}
+	        			if(i=='Total'){
+	        				$("#tot_c_cal").append("<div class='col-sm-2'>"+ i +" : </div><div class='col-sm-2'> Fixed Price  </div><div class='col-sm-1'>+</div><div class='col-sm-3'>Variable Price</div><br/>");
+	        				$("#tot_c_cal").append("<div class='col-sm-2'>"+ i +" : </div><div class='col-sm-2'>"+ x["Fixed Price"] +"</div><div class='col-sm-1'>+</div><div class='col-sm-3'>"+ x["Variable Price"] +"</div><br/>");
+	        				$("#tot_c_cal").append("<div class='col-sm-12'> ------------------------------------------------------------------------------------------ </div><br/>");
+	        				$("#tot_c_cal").append("<div class='col-sm-2'>"+ i +" : </div><div class='col-sm-2'>"+ item +"</div><br/>");
+	        			}
+	        			
+	        		}else{
+	        			$("#f_c_cal").append("<div class='col-sm-6'>"+ i +" : </div><div class='col-sm-6'>"+ item +"</div><br/>");
+	    				
+	        		}          		
+	        		
+	        	  });
+	        	$("#v_c_cal").append("<div class='col-sm-12'> ------------------------------------------------------------------------------------------ </div><br/>");
+				$("#v_c_cal").append("<div class='col-sm-6'>Variable Price : </div><div class='col-sm-6'>"+ x["Variable Price"] +"</div><br/>");
+	      		$("#f_c_cal").append("<div class='col-sm-12'> ------------------------------------------------------------------------------------------ </div><br/>");
+	  			$("#f_c_cal").append("<div class='col-sm-6'> Fixed Price: </div><div class='col-sm-6'>"+ x["Fixed Price"] +"</div><br/>");
+        	  }
+		catch(e){
+			$("#f_c_cal").append("<div class='col-sm-12'> No data Available </div><br/>");
+			$("#v_c_cal").append("<div class='col-sm-12'>  No data Available  </div><br/>");
+			$("#tot_c_cal").append("<div class='col-sm-12'>  No data Available  </div><br/>");
+		      }
+          }
+        });
+        $('#cost_runmatch').modal({
+	        show: true
+	    });
+	});
+	
 }]);

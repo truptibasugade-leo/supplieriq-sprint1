@@ -20,7 +20,7 @@ import time
 from django.utils.http import cookie_date
 from django.core.cache import cache
 from django.contrib.auth.models import Group
-from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer
+from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -156,6 +156,7 @@ class ItemsAPI(APIView):
     
 class CostAPI(APIView):
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+        
     def post(self, request,*args, **kwargs):
         v_id = request.data.get('vendor_id')
         i_id = request.data.get('item_id')
@@ -173,4 +174,46 @@ class CostAPI(APIView):
                 v_c_obj.save()
         return Response(json.dumps(request.data))
     
-     
+class RunMatchAPI(APIView):
+    
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    def get(self, request,*args, **kwargs):   
+        try:     
+            cost = {}
+#             import ipdb;ipdb.set_trace()    
+            itemvendor = request.query_params['itemvendor']            
+            qty = request.query_params['quantity']            
+            obj = ItemVendor.objects.get(id = itemvendor)
+            f_c = obj.fixedcost_set.all()
+            v_c = obj.variablecost_set.all()
+            fixed_cost = 0
+            variable_cost = 0
+            if f_c:
+                for x in f_c:
+                    fixed_cost += int(x.cost)
+                    cost[str(x.cost_type)] = int(x.cost)
+#             print fixed_cost
+            if v_c:
+                val = v_c.values_list('quantity','cost')
+                cc =filter(lambda x: int(x[0]) <= int(qty),val)
+                m = max( [ int(x[0]) for x in cc])
+                closest =[b for b in cc if int(b[0]) == m]
+                variable_cost = int(closest[0][1]) * int(qty)
+                cost['Price (per unit)'] = closest[0][1]
+#             print variable_cost
+            total= fixed_cost + variable_cost
+#             print total
+            cost['Quantity'] = qty            
+            cost['Fixed Price'] = fixed_cost
+            cost['Variable Price'] =variable_cost
+            cost[ 'Total']=total
+            print cost
+#             serializer = ItemVendorSerializer(queryset, many=True)
+#             print serializer.data 
+            return Response(json.dumps(cost))
+        except:
+            queryset = ItemVendor.objects.all()
+            serializer = ItemVendorSerializer(queryset, many=True)    
+                     
+            return Response({'serializer':serializer.data},template_name="run_match.html")
+   

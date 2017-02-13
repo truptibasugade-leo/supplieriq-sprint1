@@ -15,4 +15,6 @@ urlpatterns = [
         name='items'),
     url(r'^cost', views.CostAPI.as_view(),
         name='cost'),
+    url(r'^runmatch', views.RunMatchAPI.as_view(),
+        name='runmatch'),
 ]
