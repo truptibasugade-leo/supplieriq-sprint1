@@ -70,3 +70,15 @@ border-color: #806B23;
 	width: 30px;
 	height: 30px;
 }
+#result{	
+	position: fixed;
+	right: 80px;
+	top: 100px;	
+	
+	z-index: 9999;
+}
+.alert-success {
+	
+	background: #CCBA7C;
+	color: #333;
+}

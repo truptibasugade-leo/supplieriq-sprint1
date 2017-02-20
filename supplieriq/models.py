@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+import uuid
+from datetime import datetime    
 
 class Company(models.Model):
 
@@ -36,11 +38,12 @@ class Vendor(models.Model):
     phone = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(max_length=254, blank=True)
     erp_vendor_code = models.CharField(max_length=256, null=True, blank=True)
+    send_quote_id = models.CharField(max_length=100, blank=True, default=uuid.uuid4)
+    link_expiration_date = models.DateTimeField(default=datetime.now)
+    
     def __unicode__(self):
         return self.name
     
-
-
 class Item(models.Model):
 
     """

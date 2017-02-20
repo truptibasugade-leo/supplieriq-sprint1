@@ -256,4 +256,43 @@ class ItemVendorSerializer(serializers.Serializer):
     def get_item_object(self, obj):        
         return {"item_name":obj.item.name,"item_id": obj.item.id} ; 
 
-       
+class CostSerializer(serializers.Serializer):
+    fixed_cost_item = serializers.SerializerMethodField('get_item_fixed_cost')
+    variable_cost_item = serializers.SerializerMethodField('get_item_variable_cost') 
+    
+    class Meta(object):
+        model = ItemVendor
+        fields = (
+            'item','vendor','fixed_cost_item','variable_cost_item',
+        )
+    def get_item_fixed_cost(self, obj):
+        
+        price_details = []
+
+        fc_objs = FixedCost.objects.filter(itemvendor=obj.id)
+        fc=[]
+        for y in fc_objs:
+            q1 = {}
+            q1['fixedcost_id'] = y.id
+            q1[y.cost_type] = y.cost
+            fc.append(q1)
+        if fc:                 
+            price_details.append(fc)
+        return price_details; 
+    
+    def get_item_variable_cost(self, obj):  
+        price_details = []
+        vc_objs = VariableCost.objects.filter(itemvendor=obj.id)
+        vc = []
+        for z in vc_objs:
+            q2 = {}          
+            q2['variablecost_id'] = z.id  
+            q2['Cost'] = z.cost
+            q2['Quantity'] = z.quantity
+
+            
+            vc.append(q2)
+        if vc:
+            price_details.append(vc)
+        return price_details;      
+    

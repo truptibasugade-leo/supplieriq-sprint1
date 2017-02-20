@@ -17,4 +17,6 @@ urlpatterns = [
         name='cost'),
     url(r'^runmatch', views.RunMatchAPI.as_view(),
         name='runmatch'),
+    url(r'^quote', views.QuoteAPI.as_view(),
+        name='quote'),
 ]

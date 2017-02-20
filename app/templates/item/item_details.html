@@ -11,6 +11,7 @@ $(document).ready(function() {
 	<div class="container">
 		<div class="row">
 			<h3><strong>Item</strong></h3>
+			<div id="result"></div>
 			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
 				{% for key, value in serializer.items%}
 					{% if key == 'name' %}
@@ -78,6 +79,7 @@ $(document).ready(function() {
 							<th>Phone </th>
 							<th>Email</th>	
 							<th>Price</th>	
+							<th>Send Quote Request</th>	
 							<!-- <th>Variable Cost</th>			 -->				
 						</tr>
 					</thead>
@@ -129,6 +131,7 @@ $(document).ready(function() {
 										</td>										
 										{% endif %} 
 									{% endfor%}
+									<td><a class="send_quote" data-vendor-id ="{{x.vendorid}}" data-item-id ="{{serializer.itemid}}" href="javascript:void(0);">Send Quote</a></td>
 								</tr>
 								{% endfor%}
 							{% endif %}
@@ -181,25 +184,24 @@ $(document).ready(function() {
 		        <h2 >Fixed Price.</h2>
 		        <div class="col-sm-6">Price Type</div><div id="f_c" class="col-sm-6">Price</div>
 	        </div>
-	        <div>
+	        <!-- <div>
 	        	<form id="f_price_form">	        	
 					{% csrf_token %}						    
 		        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price Type" name="price_type" required/></div>
 		        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price" name="price" required/></div>
-		        	<div class="col-sm-offset-6 col-sm-6">
-		        		
+		        	<div class="col-sm-offset-6 col-sm-6">		        		
 		        		<button type="submit" id="add_f_price" class="btn btn-default btn-primary" style="float: right;">Add Fixed Price</button>
 		        	</div>
 	        	</form>
-	        	<!-- <a id="f_price_button"href="javascript:void(0);">Add Fixed Price</a>
-	        	 -->
-	        </div>
+	        	
+	        	
+	        </div> -->
 	        <div>
 		        <h2 >Variable Price</h2>
 		        <div class="col-sm-6">Quantity</div><div id="v_c" class="col-sm-6">Price(per unit)</div>
 	        </div>
 	      </div>
-	      <div>
+	      <!-- <div>
 	      	<form id="v_price_form">
 	      		{% csrf_token %}		
 	        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Quantity" name="quantity" required/></div>
@@ -208,9 +210,9 @@ $(document).ready(function() {
 	        		<button type="submit" id="add_v_price" class="btn btn-default btn-primary" style="float: right;">Add Variable Price</button>
 	        	</div>
         	</form>
-	      	<!-- <a href="javascript:void(0);">Add Variable Price</a> -->
+	      	
 	      </div>
-	      <input type="hidden" id="hidden_field" >
+	      <input type="hidden" id="hidden_field" > -->
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 	      </div>

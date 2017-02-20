@@ -48,16 +48,3 @@ class LoginForm(GenericForm):
         max_length=PASSWORD_MAX_LENGTH,
     )
     
-#     remember_me = forms.BooleanField(
-#         # default=False,
-#     )
-
-#     def __init__(self, *args, **kwargs):
-#         super(LoginForm, self).__init__(*args, **kwargs)
-#         self.helper.layout = Layout(
-#             'identification', 'password', 'remember_me',
-#             HTML("""
-#                                     <a ng-controller="LoginFormController" ng-click="get_form('passwordReset');" href="javascript:void(0);">""" + FORGOT_LINK + """</a>
-#                                     <br />
-#                                     <a ng-controller="LoginFormController" ng-click="get_form('accountactivation')" href="javascript:void(0);">""" + ACTIVATION_LINK + """</a>
-#                                     """))

@@ -20,13 +20,16 @@ import time
 from django.utils.http import cookie_date
 from django.core.cache import cache
 from django.contrib.auth.models import Group
-from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer
+from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer,CostSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
 from supplieriq.models import Vendor,Company, Item, Address,Price,FixedCost,VariableCost,ItemVendor
 from django.shortcuts import render_to_response
-
+import uuid 
+from django.conf import settings
+from django.core.mail.message import EmailMessage
+from django.core.mail import send_mail
 
 class ObtainAuthToken(APIView):
 
@@ -160,27 +163,47 @@ class CostAPI(APIView):
     def post(self, request,*args, **kwargs):
         v_id = request.data.get('vendor_id')
         i_id = request.data.get('item_id')
-        price = request.data.get('price')
-        objs=ItemVendor.objects.filter(vendor_id = v_id , item_id = i_id)     
-        price_type = request.data.get('price_type')
-        if price_type:
-            for x in objs:
-                f_c_obj = FixedCost(itemvendor=x,cost_type=price_type,cost=price)
-                f_c_obj.save()
-        else:
+        if v_id:
+            # To add new fixed cost and variable cost
+            price = request.data.get('price')
+            objs=ItemVendor.objects.filter(vendor_id = v_id , item_id = i_id)     
+            price_type = request.data.get('price_type')
+            if price_type:
+                for x in objs:
+                    f_c_obj = FixedCost(itemvendor=x,cost_type=price_type,cost=price)
+                    f_c_obj.save()
+            else:
+                quantity = request.data.get('quantity')
+                for x in objs:
+                    v_c_obj = VariableCost(itemvendor=x,quantity=quantity,cost=price)
+                    v_c_obj.save()
+            return Response(json.dumps(request.data))
+        else:    
+            # To update existing fixed cost and variable cost       
+            price_type = request.data.get('price_type')
             quantity = request.data.get('quantity')
-            for x in objs:
-                v_c_obj = VariableCost(itemvendor=x,quantity=quantity,cost=price)
+            price = request.data.get('price')
+            
+            if price_type:
+                id = request.data.get('fixedcost_id')            
+                f_c_obj = FixedCost.objects.get(id=id)
+                f_c_obj.cost_type = price_type
+                f_c_obj.cost = price
+                f_c_obj.save()
+            else:
+                id = request.data.get('variablecost_id')            
+                v_c_obj = VariableCost.objects.get(id=id)
+                v_c_obj.quantity = quantity
+                v_c_obj.cost = price
                 v_c_obj.save()
-        return Response(json.dumps(request.data))
-    
+            return Response(json.dumps(request.data))
+        
 class RunMatchAPI(APIView):
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):   
         try:     
             cost = {}
-#             import ipdb;ipdb.set_trace()    
             itemvendor = request.query_params['itemvendor']            
             qty = request.query_params['quantity']            
             obj = ItemVendor.objects.get(id = itemvendor)
@@ -216,4 +239,32 @@ class RunMatchAPI(APIView):
             serializer = ItemVendorSerializer(queryset, many=True)    
                      
             return Response({'serializer':serializer.data},template_name="run_match.html")
-   
+
+class QuoteAPI(APIView):
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    
+    def get(self, request,*args, **kwargs):        
+        try:
+            v_id = request.query_params['vendorid']
+            i_id = request.query_params['itemid']
+            i_obj = Item.objects.get(id= i_id)
+            v_obj = Vendor.objects.get(id= v_id)
+            v_i_id = ItemVendor.objects.get(vendor=v_id,item=i_id)
+            v_obj.send_quote_id = uuid.uuid4()
+            v_obj.link_expiration_date = datetime.datetime.now()
+            v_obj.save()
+            
+            domain = request.META['HTTP_HOST']
+            text_content = 'To Update the price for Item - '+str(i_obj.name)+'<br/><a href="http://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)+'">Please Click this link. </a>'
+            email = EmailMessage(subject='Quote Request',body=text_content,from_email=settings.DEFAULT_FROM_EMAIL,to=['truptib@leotechnosoft.net'])
+            email.content_subtype = "html"
+            email.send()
+            return Response({'serializer':'Link has been sent to the email address.'})
+        except:
+            v_i_id = request.query_params['vendoritem']
+            send_quote_id = request.query_params['send_quote_id']
+            obj=ItemVendor.objects.get(id =v_i_id)
+            serializer = CostSerializer(obj)
+            return Response({'serializer':serializer.data,'vendor_id':obj.vendor_id,'item_id':obj.item_id},template_name="update_cost.html")
+
+    

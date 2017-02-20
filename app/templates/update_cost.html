@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+{% load generic_tags %}
+{% block content%}
+<script src="{% static 'js/datatables/dataTables.colReorder.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	$('#example1').DataTable();
+	$('#example').DataTable({
+		"responsive": true,
+		colReorder: {
+    		order: [ 1 ,0 ,2]	
+		}
+	});
+} );
+</script>
+<div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12 col-lg-12"> 
+				<h4><strong>Fixed Price</strong><a id="add_f_c" href="javascript:void(0);" style="margin-left: 70%;"> + Add New Fixed Price</a></h4>
+				<div id="result"></div>
+				<table class="table table-striped table-bordered custom_datatable" id="example1" cellspacing="0" width="100%">
+					<thead>
+						<tr>							
+							<th>Price Type</th>
+							<th>Price</th>	
+							<th>Update</th>											
+						</tr>
+					</thead>
+					<tbody>
+						{% for key, value in serializer.items %}
+							{% if key == 'fixed_cost_item' %}	
+								{% for data in value %}
+									{% for data1 in data %}
+										
+											<tr class="gradeA odd" >
+												{% for key1,value1 in data1.items%}
+												 	{% if key1 != 'fixedcost_id' %}
+														<td>{{key1}}</td>	
+														<td>{{value1}}</td>	
+														<td class="edit_fix_cost" data-id="{{data1.fixedcost_id}}" data-cost="{{value1}}" data-cost-type="{{key1}}">Edit</td>
+													{% endif %}																										
+												{% endfor %}	
+												
+											</tr>										
+																
+									{% endfor %}
+								{% endfor %}							
+							{% endif %}
+						{% endfor %} 
+					</tbody>
+				</table>
+				<br/>
+				<br/>
+				<h4><strong>Variable Price</strong><a id="add_v_c" href="javascript:void(0);" style="margin-left: 67%;"> + Add New Variable Price</a></h4>
+				 <table class="table table-striped table-bordered custom_datatable" id="example" cellspacing="0" width="100%">
+					<thead>
+						<tr>							
+							<th>Price</th>
+							<th>Quantity</th>	
+							<th>Update</th>										
+						</tr>
+					</thead>
+					<tbody>
+						{% for key, value in serializer.items %}
+							{% if key == 'variable_cost_item' %}	
+								{% for data in value %}
+									{% for data1 in data %}
+										
+											<tr class="gradeA odd" >
+												{% for key1,value1 in data1.items%}
+													{% if key1 != 'variablecost_id'%}
+														<td>{{value1}}</td>														
+													{% endif %}
+												{% endfor %}	
+												<td class="edit_var_cost" data-id="{{data1.variablecost_id}}" data-cost="{{data1.Cost}}" data-quantity="{{data1.Quantity}}">Edit</td>
+											</tr>										
+																
+									{% endfor %}
+								{% endfor %}							
+							{% endif %}
+						{% endfor %} 
+					</tbody>
+				</table>		
+				</div>
+			</div>
+		 </div>
+	</div> 
+</div>
+<!-- Modal -->
+	<div id="edit_fixed_cost" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Fixed Price Details</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<form id="update_f_c">
+	      		{% csrf_token %}
+	      			<input type="text" name="price_type" placeholder="Price Type" required></input>
+	      			<input type="text" name="price" placeholder="Price" required></input>
+	      			<button type="submit" class="btn btn-default btn-primary">Update</button>
+	      		</form>
+	      	</div>	
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	<div id="edit_variable_cost" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Variable Price Details</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<form id="update_v_c">
+	      		{% csrf_token %}
+	      			<input type="text" name="quantity" placeholder="Quantity" required></input>
+	      			<input type="text" name="price" placeholder="Price" required></input>
+	      			<button type="submit" class="btn btn-default btn-primary">Update</button>
+	      		</form>
+	      	</div>	
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	
+	<div id="add_fixed_cost" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Fixed Price Details</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<div>
+		        	<form id="add_f_price_form">	        	
+						{% csrf_token %}						    
+			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price Type" name="price_type" required/></div>
+			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price" name="price" required/></div>
+			        	<div class="col-sm-offset-6 col-sm-6">
+			        		
+			        		<button type="submit" id="add_f_price" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Add Fixed Price</button>
+			        	</div>
+		        	</form>
+		        	<!-- <a id="f_price_button"href="javascript:void(0);">Add Fixed Price</a>
+		        	 -->
+		        </div>
+	      </div>
+	       <input type="hidden" id="hidden_field_fixed" data-item-id="{{item_id}}" data-vendor-id="{{vendor_id}}" >
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	</div>
+	
+	<div id="add_variable_cost" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Variable Price Details</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<div>
+			      	<form id="add_v_price_form">
+			      		{% csrf_token %}		
+			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Quantity" name="quantity" required/></div>
+			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price (per unit)" name="price" required/></div>
+			        	<div class="col-sm-offset-6 col-sm-6">
+			        		<button type="submit" id="add_v_price" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Add Variable Price</button>
+			        	</div>
+		        	</form>
+			      	<!-- <a href="javascript:void(0);">Add Variable Price</a> -->
+			     </div>
+	      	</div>	
+	      </div>
+	       <input type="hidden" id="hidden_field_variable" data-item-id="{{item_id}}" data-vendor-id="{{vendor_id}}" >
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+{% endblock %}
+

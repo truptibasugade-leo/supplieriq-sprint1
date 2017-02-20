@@ -80,6 +80,27 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
         });
 	});
 	
+	$(".send_quote").on('click',function(e){
+		var vendor_id = $(this).data('vendor-id')
+		var item_id = $(this).data('item-id')
+		$.ajax({
+          type: 'get',
+          url: '/quote/',
+          data: {"vendorid":vendor_id, "itemid" :item_id},
+          success: function (data) {
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>'+data.serializer+'</div>');
+              window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+          }
+		});
+	});
+	
 	$('#run_match_form').on('submit', function (e) {
         e.preventDefault();
         var data = $('#run_match_form').serializeArray();
@@ -129,5 +150,158 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
 	        show: true
 	    });
 	});
+	
+	$('.edit_fix_cost').on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var cost = $(this).data('cost');
+		var cost_type = $(this).data('cost-type');
+		$('#edit_fixed_cost input[name="price_type"]').val(cost_type);
+		$('#edit_fixed_cost input[name="price"]').val(cost);
+		
+		$("#edit_fixed_cost").attr('data-fixedcost-id',id);
+		
+        $('#edit_fixed_cost').modal({
+	        show: true
+	    });
+	});
+	$('.edit_var_cost').on('click', function (e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var qty = $(this).data('quantity');
+		var cost = $(this).data('cost');
+		$('#edit_variable_cost input[name="quantity"]').val(qty);
+		$('#edit_variable_cost input[name="price"]').val(cost);
+		
+		$("#edit_variable_cost").attr('data-variablecost-id',id);
+        
+		$('#edit_variable_cost').modal({
+	        show: true
+	    });
+	});
+	
+	$('#update_f_c').on('submit', function (e) {
+        e.preventDefault();
+        var id = $("#edit_fixed_cost").data('fixedcost-id');
+        var data = $(this).serializeArray();
+        data.push({ name:'fixedcost_id', value:id });
+        $.ajax({
+        	
+          type: 'post',
+          url: '/cost/',
+          data: data,
+          success: function (data) {
+        	  $('#edit_fixed_cost').modal('toggle');
+              
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
+        	  window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+              location.reload(); 
+
+        	}
+        });
+	});
+	
+	$('#update_v_c').on('submit', function (e) {
+		e.preventDefault();
+		var id = $("#edit_variable_cost").data('variablecost-id');
+        var data = $(this).serializeArray();
+        data.push({ name:'variablecost_id', value:id });
+        $.ajax({
+        	
+          type: 'post',
+          url: '/cost/',
+          data: data,
+          success: function (data) {
+        	  $('#edit_variable_cost').modal('toggle');
+        	  
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
+              window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+              location.reload();
+        	 }
+        });
+	});
+	$('#add_f_c').on('click', function (e) {
+		e.preventDefault();
+		$('#add_fixed_cost').modal({
+	        show: true
+	    });
+	});
+	$('#add_v_c').on('click', function (e) {
+		e.preventDefault();        
+		$('#add_variable_cost').modal({
+	        show: true
+	    });
+	});
+	$('#add_f_price_form').on('submit', function (e) {
+        e.preventDefault();
+        var i_id = $("#hidden_field_fixed").data('item-id');
+		var v_id = $("#hidden_field_fixed").data('vendor-id');
+        var data = $('#add_f_price_form').serializeArray();
+        data.push({ name:'vendor_id', value:v_id });
+        data.push({ name:'item_id',value:i_id });
+        $.ajax({
+          type: 'post',
+          url: '/cost/',
+          data: data,
+          success: function (data) {
+//        	  var x = JSON.parse(data);
+//        	  $("<div class='col-sm-6'>"+x.price_type+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#f_c");
+        	  $('#add_fixed_cost').modal('toggle');
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
+              window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+              location.reload();
+          }
+        });
+	});
+	$('#add_v_price_form').on('submit', function (e) {
+        e.preventDefault();
+        var i_id = $("#hidden_field_variable").data('item-id');
+		var v_id = $("#hidden_field_variable").data('vendor-id');
+        var data = $('#add_v_price_form').serializeArray();
+        data.push({ name:'vendor_id', value:v_id });
+        data.push({ name:'item_id',value:i_id });
+        $.ajax({
+          type: 'post',
+          url: '/cost/',
+          data: data,
+          success: function (data) {
+//        	  var x = JSON.parse(data);
+//        	  $("<div class='col-sm-6'>"+x.quantity+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#v_c");
+        	  $('#add_variable_cost').modal('toggle');
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
+              window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+              location.reload();
+          }
+        });
+	});
+	
 	
 }]);
