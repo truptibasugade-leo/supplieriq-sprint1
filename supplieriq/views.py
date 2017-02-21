@@ -256,7 +256,7 @@ class QuoteAPI(APIView):
             
             domain = request.META['HTTP_HOST']
             text_content = 'To Update the price for Item - '+str(i_obj.name)+'<br/><a href="http://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)+'">Please Click this link. </a>'
-            email = EmailMessage(subject='Quote Request',body=text_content,from_email=settings.DEFAULT_FROM_EMAIL,to=['truptib@leotechnosoft.net'])
+            email = EmailMessage(subject='Quote Request',body=text_content,from_email=settings.DEFAULT_FROM_EMAIL,to=[str(v_obj.email)])
             email.content_subtype = "html"
             email.send()
             return Response({'serializer':'Link has been sent to the email address.'})
