@@ -296,3 +296,69 @@ class CostSerializer(serializers.Serializer):
             price_details.append(vc)
         return price_details;      
     
+class FixedCostSerializer(serializers.Serializer):
+
+    """
+    Purpose: To handle validations and populate sign in details.
+    Methods Supported: Get & Post.
+    """
+    itemvendor = ItemVendorSerializer(read_only=True, many=True)
+    price_type = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate(self, attrs):
+        """
+        Purpose: To validate FixedCost serializers.
+        :param self: Context Object
+        :param attrs: Dictionary containing the key as field name & it's value
+        :param source: Field name
+        Constraints:
+        User account should be present and should be active.
+        :returns: attrs in case of valid inputs else error message
+        """
+        
+        price_type = attrs.get('price_type')
+        price = attrs.get('price')   
+        if price_type.isdigit():
+            error = "Invalid data.Price Type cannot be a number."
+            raise serializers.ValidationError(error)        
+        return attrs
+
+class VariableCostSerializer(serializers.Serializer):
+
+    """
+    Purpose: To handle validations and populate sign in details.
+    Methods Supported: Get & Post.
+    """
+    itemvendor = ItemVendorSerializer(read_only=True, many=True)
+    quantity = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate(self, attrs):
+        """
+        Purpose: To validate FixedCost serializers.
+        :param self: Context Object
+        :param attrs: Dictionary containing the key as field name & it's value
+        :param source: Field name
+        Constraints:
+        User account should be present and should be active.
+        :returns: attrs in case of valid inputs else error message
+        """
+        
+        quantity = attrs.get('quantity')
+        price = attrs.get('price')   
+        if not quantity.isdigit():
+            error = "Invalid data.Quantity has to be a number."
+            raise serializers.ValidationError(error) 
+        else:
+            import ipdb;ipdb.set_trace()
+            try:       
+                queryset= VariableCost.objects.filter(itemvendor=self.initial_data['itemvendor'],quantity=attrs.get('quantity'))                
+            except:
+                queryset = ''                   
+            if queryset:
+                vv = queryset.first()
+                if str(vv.id) != str(self.initial_data['variablecost_id']):
+                    error = "Price for this Quantity already exists."
+                    raise serializers.ValidationError(error) 
+        return attrs

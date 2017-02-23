@@ -191,19 +191,31 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: data,
           success: function (data) {
-        	  $('#edit_fixed_cost').modal('toggle');
-              
-        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
-        	  window.setTimeout(function() {
-                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                        $(this).remove(); 
-                    });
-                }, 5000);
-              $('.alert .close').on("click", function(e){
-                    $(this).parent().fadeTo(500, 0).slideUp(500);
-                 });
-              location.reload(); 
-
+        	  x=JSON.parse(data);
+    		  $("input[name='price_type']").next('span').html("");
+    		  $("input[name='price']").next('span').html("");
+    		  if(x.status == "error"){
+    				if(x.price){
+    					$("input[name='price']").next('span').html(x.price);
+    				}
+    				if(x.non_field_errors){
+    					$("input[name='price_type']").next('span').html(x.non_field_errors)
+    				}
+    			}
+    		  else{   
+		        	  $('#edit_fixed_cost').modal('toggle');
+		              
+		        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
+		        	  window.setTimeout(function() {
+		                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+		                        $(this).remove(); 
+		                    });
+		                }, 5000);
+		              $('.alert .close').on("click", function(e){
+		                    $(this).parent().fadeTo(500, 0).slideUp(500);
+		                 });
+		              location.reload(); 
+    		  }
         	}
         });
 	});
@@ -219,18 +231,31 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: data,
           success: function (data) {
-        	  $('#edit_variable_cost').modal('toggle');
-        	  
-        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
-              window.setTimeout(function() {
-                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                        $(this).remove(); 
-                    });
-                }, 5000);
-              $('.alert .close').on("click", function(e){
-                    $(this).parent().fadeTo(500, 0).slideUp(500);
-                 });
-              location.reload();
+        	  x=JSON.parse(data);
+    		  $("input[name='quantity']").next('span').html("");
+    		  $("input[name='price']").next('span').html("");
+    		  if(x.status == "error"){
+    				if(x.price){
+    					$("input[name='price']").next('span').html(x.price);
+    				}
+    				if(x.non_field_errors){
+    					$("input[name='quantity']").next('span').html(x.non_field_errors)
+    				}
+    			}
+    		  else{   
+		        	  $('#edit_variable_cost').modal('toggle');
+		        	  
+		        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Updated Successfully..</div>');
+		              window.setTimeout(function() {
+		                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+		                        $(this).remove(); 
+		                    });
+		                }, 5000);
+		              $('.alert .close').on("click", function(e){
+		                    $(this).parent().fadeTo(500, 0).slideUp(500);
+		                 });
+		              location.reload();
+    		  }
         	 }
         });
 	});
@@ -257,20 +282,32 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           type: 'post',
           url: '/cost/',
           data: data,
-          success: function (data) {
-//        	  var x = JSON.parse(data);
-//        	  $("<div class='col-sm-6'>"+x.price_type+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#f_c");
-        	  $('#add_fixed_cost').modal('toggle');
-        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
-              window.setTimeout(function() {
-                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                        $(this).remove(); 
-                    });
-                }, 5000);
-              $('.alert .close').on("click", function(e){
-                    $(this).parent().fadeTo(500, 0).slideUp(500);
-                 });
-              location.reload();
+          success: function (data) {     
+        	  
+        		  x=JSON.parse(data);
+        		  $("input[name='price_type']").next('span').html("");
+        		  $("input[name='price']").next('span').html("");
+        		  if(x.status == "error"){
+        				if(x.price){
+        					$("input[name='price']").next('span').html(x.price);
+        				}
+        				if(x.non_field_errors){
+        					$("input[name='price_type']").next('span').html(x.non_field_errors)
+        				}
+        			}
+        		  else{        			  
+        			  $('#add_fixed_cost').modal('toggle');
+                	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
+                      window.setTimeout(function() {
+                            $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                                $(this).remove(); 
+                            });
+                        }, 5000);
+                      $('.alert .close').on("click", function(e){
+                            $(this).parent().fadeTo(500, 0).slideUp(500);
+                         });
+                      location.reload();
+        		  }      	   
           }
         });
 	});
@@ -286,10 +323,63 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: data,
           success: function (data) {
-//        	  var x = JSON.parse(data);
-//        	  $("<div class='col-sm-6'>"+x.quantity+"</div>"+"<div class='col-sm-6'>"+x.price+"</div>").insertAfter("#v_c");
-        	  $('#add_variable_cost').modal('toggle');
-        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
+        	  
+        		  x=JSON.parse(data);
+        		  $("input[name='quantity']").next('span').html("");
+        		  $("input[name='price']").next('span').html("");
+        		  if(x.status == "error"){
+        				if(x.price){
+        					$("input[name='price']").next('span').html(x.price);
+        				}
+        				if(x.non_field_errors){
+        					$("input[name='quantity']").next('span').html(x.non_field_errors)
+        				}
+        			}
+        		  else{
+        			  $('#add_variable_cost').modal('toggle');
+    	        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data Added Successfully..</div>');
+    	              window.setTimeout(function() {
+    	                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+    	                        $(this).remove(); 
+    	                    });
+    	                }, 5000);
+    	              $('.alert .close').on("click", function(e){
+    	                    $(this).parent().fadeTo(500, 0).slideUp(500);
+    	                 });
+    	              location.reload();  
+        		  }	        	  
+	          }          
+        });
+	});
+	$('.delete_fix_cost').on('click', function (e) {
+		e.preventDefault();
+		var data = $(this).data('id');
+		$("#hidden_id_fix").attr('data-fixedcost-id',data);
+		$("#hidden_id_fix").val(data);
+		$('#delete_fixedcost').modal({
+	        show: true
+	    });
+	});
+	$('.delete_var_cost').on('click', function (e) {
+		e.preventDefault();
+		var data = $(this).data('id');
+		$("#hidden_id_var").attr('data-variablecost-id',data);
+		$("#hidden_id_var").val(data);
+		$('#delete_variablecost').modal({
+	        show: true
+	    });
+	});
+	
+	$('#del_fixedcost').on('submit', function (e) {
+		var h =$("#hidden_id_fix").val();
+		$.ajax({
+          type: 'delete',
+          url: '/cost/',
+          data: {"fixedcost_id":h},
+          success: function (data) {
+        	  $('#delete_fixedcost').modal('toggle');
+        	  
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data has been deleted successfully..</div>');
               window.setTimeout(function() {
                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
                         $(this).remove(); 
@@ -300,7 +390,30 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
                  });
               location.reload();
           }
-        });
+		});
+	});
+	
+	$('#del_variablecost').on('submit', function (e) {
+		var h =$("#hidden_id_var").val();
+		$.ajax({
+		  type: 'delete',
+          url: '/cost/',
+          data: {"variablecost_id":h},
+          success: function (data) {
+        	  $('#delete_variablecost').modal('toggle');
+        	  
+        	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data has been deleted successfully..</div>');
+              window.setTimeout(function() {
+                    $(".alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove(); 
+                    });
+                }, 5000);
+              $('.alert .close').on("click", function(e){
+                    $(this).parent().fadeTo(500, 0).slideUp(500);
+                 });
+              location.reload();
+	       }
+		});
 	});
 	
 	

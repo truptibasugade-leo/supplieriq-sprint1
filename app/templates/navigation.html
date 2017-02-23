@@ -16,9 +16,9 @@
 				{% endif %}
 			</div>
 
-		<!-- Collect the nav links, forms, and other content for toggling -->
+		<!-- Collect the nav links, forms, and other content for toggling -->		
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			{% if request.user.is_authenticated %}
+			{% if request.user.is_authenticated and request.path != '/quote/'%}
 				<ul class="nav navbar-nav siq_navbar_style">
 							
 							<li class="dropdown">
@@ -89,10 +89,12 @@
 	        		</ul>
 				{% endif %} <!-- signin endif -->
 			{% else %} <!-- user authenticated else -->
+				{% if request.path != '/quote/' %}
 				<ul class="nav navbar-nav navbar-right">
 						<li>
 	        			<li><a class="siq_inner_signup" href="/signout/">Sign Out</a></li>
 	        		</ul>
+	        	{% endif %}
 			{% endif %} <!-- user authenticated endif -->
 		</div>
 	</div>

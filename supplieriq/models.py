@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from django.db import models
 import uuid
-from datetime import datetime    
+from datetime import datetime 
+from decimal import Decimal   
+from django.contrib.auth.models import User
 
 class Company(models.Model):
 
@@ -54,6 +56,7 @@ class Item(models.Model):
     erp_item_code = models.CharField(max_length=256, null=True, blank=True)
     description = models.CharField(max_length=20, null=True, blank=True)
     company = models.ForeignKey('Company', null=True, blank=True)  
+    target_price = models.DecimalField(max_digits=10, decimal_places=2,default=Decimal('0.00'))
     vendor = models.ManyToManyField('Vendor')
     def __unicode__(self):
         return self.name
@@ -128,4 +131,13 @@ class Price(models.Model):
             ', FixedCost: '+ self.fixedCost.cost_type +'- ' +self.fixedCost.cost 
 
     
-    
+class UserCompanyModel(models.Model):
+    """ Model to relate User and Company """
+    user = models.ForeignKey(User)
+    company = models.ForeignKey(Company)
+
+    class Meta:
+        unique_together = ("user","company")
+
+    def __unicode__(self):
+        return str(self.id)

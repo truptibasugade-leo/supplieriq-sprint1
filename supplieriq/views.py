@@ -20,7 +20,7 @@ import time
 from django.utils.http import cookie_date
 from django.core.cache import cache
 from django.contrib.auth.models import Group
-from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer,CostSerializer
+from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer,CostSerializer,FixedCostSerializer,VariableCostSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -30,6 +30,7 @@ import uuid
 from django.conf import settings
 from django.core.mail.message import EmailMessage
 from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
 
 class ObtainAuthToken(APIView):
 
@@ -159,7 +160,6 @@ class ItemsAPI(APIView):
     
 class CostAPI(APIView):
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
-        
     def post(self, request,*args, **kwargs):
         v_id = request.data.get('vendor_id')
         i_id = request.data.get('item_id')
@@ -168,15 +168,32 @@ class CostAPI(APIView):
             price = request.data.get('price')
             objs=ItemVendor.objects.filter(vendor_id = v_id , item_id = i_id)     
             price_type = request.data.get('price_type')
+            d = request.data.copy()            
             if price_type:
                 for x in objs:
-                    f_c_obj = FixedCost(itemvendor=x,cost_type=price_type,cost=price)
-                    f_c_obj.save()
+                   
+                    o = FixedCostSerializer(data=request.data)
+                    if o.is_valid():
+                        f_c_obj = FixedCost(itemvendor=x,cost_type=price_type,cost=price)
+                        f_c_obj.save()
+                    else:
+                        err = o.errors
+                        err.update({"status":"error"})
+                        return Response(json.dumps(err))
+
             else:
                 quantity = request.data.get('quantity')
                 for x in objs:
-                    v_c_obj = VariableCost(itemvendor=x,quantity=quantity,cost=price)
-                    v_c_obj.save()
+                    d.update({"itemvendor":x})
+                    o = VariableCostSerializer(data=d)
+                    if o.is_valid():
+                        v_c_obj = VariableCost(itemvendor=x,quantity=quantity,cost=price)
+                        v_c_obj.save()
+                    else:
+                        err = o.errors
+                        err.update({"status":"error"})
+                        return Response(json.dumps(err))
+                    
             return Response(json.dumps(request.data))
         else:    
             # To update existing fixed cost and variable cost       
@@ -185,19 +202,44 @@ class CostAPI(APIView):
             price = request.data.get('price')
             
             if price_type:
-                id = request.data.get('fixedcost_id')            
-                f_c_obj = FixedCost.objects.get(id=id)
-                f_c_obj.cost_type = price_type
-                f_c_obj.cost = price
-                f_c_obj.save()
+                id = request.data.get('fixedcost_id')      
+                o = FixedCostSerializer(data=request.data)      
+                if o.is_valid():
+                    f_c_obj = FixedCost.objects.get(id=id)
+                    f_c_obj.cost_type = price_type
+                    f_c_obj.cost = price
+                    f_c_obj.save()
+                else:
+                    err = o.errors
+                    err.update({"status":"error"})
+                    return Response(json.dumps(err))
             else:
-                id = request.data.get('variablecost_id')            
+                d = request.data.copy()    
+                id = request.data.get('variablecost_id')     
                 v_c_obj = VariableCost.objects.get(id=id)
-                v_c_obj.quantity = quantity
-                v_c_obj.cost = price
-                v_c_obj.save()
+                d.update({"itemvendor":v_c_obj.itemvendor})
+                o = VariableCostSerializer(data=d)
+                if o.is_valid():                    
+                    v_c_obj.quantity = quantity
+                    v_c_obj.cost = price
+                    v_c_obj.save()
+                else:
+                    err = o.errors
+                    err.update({"status":"error"})
+                    return Response(json.dumps(err))
             return Response(json.dumps(request.data))
         
+    def delete(self,request):
+        v_id = request.data.get('variablecost_id')
+        f_id = request.data.get('fixedcost_id')
+        if f_id:
+            ob = FixedCost.objects.get(id = f_id)
+            ob.delete()
+        else:
+            ob =VariableCost.objects.get(id = v_id)
+            ob.delete()
+        return Response({'serializer':'Data has been deleted successfully.'})
+    
 class RunMatchAPI(APIView):
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
@@ -260,10 +302,16 @@ class QuoteAPI(APIView):
             email.content_subtype = "html"
             email.send()
             return Response({'serializer':'Link has been sent to the email address.'})
-        except:
+        except: 
             v_i_id = request.query_params['vendoritem']
             send_quote_id = request.query_params['send_quote_id']
-            obj=ItemVendor.objects.get(id =v_i_id)
+            obj=ItemVendor.objects.get(id =v_i_id)  
+            try:
+                v_ob = Vendor.objects.get(id=obj.vendor.id,send_quote_id=send_quote_id)
+                if (datetime.datetime.now(timezone.utc) - v_ob.link_expiration_date) > datetime.timedelta(1): 
+                    return Response({'serializer':'This link has been expired. Please send the Quote request again.','status':'expired'},template_name="update_cost.html")
+            except:
+                return Response({'serializer':'Unauthorized..!! You cannot access this link.','status':'unauthorized'},template_name="update_cost.html")
             serializer = CostSerializer(obj)
             return Response({'serializer':serializer.data,'vendor_id':obj.vendor_id,'item_id':obj.item_id},template_name="update_cost.html")
 

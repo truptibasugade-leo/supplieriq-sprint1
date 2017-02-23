@@ -18,6 +18,9 @@ $(document).ready(function() {
 <div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
 	<div class="container">
 		<div class="row">
+			{% if status %}
+				<div class="col-sm-12 col-lg-12"><h1>{{serializer}}</h1></div>
+			{% else %}
 			<div class="col-sm-12 col-lg-12"> 
 				<h4><strong>Fixed Price</strong><a id="add_f_c" href="javascript:void(0);" style="margin-left: 70%;"> + Add New Fixed Price</a></h4>
 				<div id="result"></div>
@@ -26,7 +29,7 @@ $(document).ready(function() {
 						<tr>							
 							<th>Price Type</th>
 							<th>Price</th>	
-							<th>Update</th>											
+							<th>Update/Delete</th>											
 						</tr>
 					</thead>
 					<tbody>
@@ -40,7 +43,10 @@ $(document).ready(function() {
 												 	{% if key1 != 'fixedcost_id' %}
 														<td>{{key1}}</td>	
 														<td>{{value1}}</td>	
-														<td class="edit_fix_cost" data-id="{{data1.fixedcost_id}}" data-cost="{{value1}}" data-cost-type="{{key1}}">Edit</td>
+														<td>
+															<span class="edit_fix_cost glyphicon glyphicon-pencil" data-id="{{data1.fixedcost_id}}" data-cost="{{value1}}" data-cost-type="{{key1}}" style="cursor: pointer;margin-right: 10px;"></span>
+															<span class="delete_fix_cost glyphicon glyphicon-trash" data-id="{{data1.fixedcost_id}}" style="cursor: pointer;"></span>
+														</td>
 													{% endif %}																										
 												{% endfor %}	
 												
@@ -60,7 +66,7 @@ $(document).ready(function() {
 						<tr>							
 							<th>Price</th>
 							<th>Quantity</th>	
-							<th>Update</th>										
+							<th>Update/Delete</th>										
 						</tr>
 					</thead>
 					<tbody>
@@ -75,7 +81,10 @@ $(document).ready(function() {
 														<td>{{value1}}</td>														
 													{% endif %}
 												{% endfor %}	
-												<td class="edit_var_cost" data-id="{{data1.variablecost_id}}" data-cost="{{data1.Cost}}" data-quantity="{{data1.Quantity}}">Edit</td>
+												<td>
+													<span class="edit_var_cost glyphicon glyphicon-pencil" data-id="{{data1.variablecost_id}}" data-cost="{{data1.Cost}}" data-quantity="{{data1.Quantity}}" style="cursor: pointer;margin-right: 10px;"></span>
+													<span class="delete_var_cost glyphicon glyphicon-trash" data-id="{{data1.variablecost_id}}" style="cursor: pointer;"></span>
+												</td>
 											</tr>										
 																
 									{% endfor %}
@@ -85,6 +94,7 @@ $(document).ready(function() {
 					</tbody>
 				</table>		
 				</div>
+			{% endif %}
 			</div>
 		 </div>
 	</div> 
@@ -102,9 +112,17 @@ $(document).ready(function() {
 	      	<div class="row" style="padding: 15px;">
 	      		<form id="update_f_c">
 	      		{% csrf_token %}
-	      			<input type="text" name="price_type" placeholder="Price Type" required></input>
-	      			<input type="text" name="price" placeholder="Price" required></input>
-	      			<button type="submit" class="btn btn-default btn-primary">Update</button>
+	      		<div class="col-sm-6">
+	      			<input type="text" class="form-control" name="price_type" placeholder="Price Type" required></input>
+	      			<span class="help-block"></span>
+	      		</div>
+	      		<div class="col-sm-6">
+	      			<input type="text" class="form-control" name="price" placeholder="Price" required></input>
+	      			<span class="help-block"></span>
+	      		</div>
+	      		<div class="col-sm-offset-6 col-sm-6">
+	      			<button type="submit" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Update</button>
+	      		</div>
 	      		</form>
 	      	</div>	
 	      </div>
@@ -127,9 +145,17 @@ $(document).ready(function() {
 	      	<div class="row" style="padding: 15px;">
 	      		<form id="update_v_c">
 	      		{% csrf_token %}
-	      			<input type="text" name="quantity" placeholder="Quantity" required></input>
-	      			<input type="text" name="price" placeholder="Price" required></input>
-	      			<button type="submit" class="btn btn-default btn-primary">Update</button>
+	      		<div class="col-sm-6">
+	      			<input type="text" class="form-control" name="quantity" placeholder="Quantity" required></input>
+	      			<span class="help-block"></span>
+	      		</div>
+	      		<div class="col-sm-6">
+	      			<input type="text" class="form-control" name="price" placeholder="Price" required></input>
+	      			<span class="help-block"></span>
+	      		</div>
+	      		<div class="col-sm-offset-6 col-sm-6">	
+	      			<button type="submit" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Update</button>
+	      		</div>
 	      		</form>
 	      	</div>	
 	      </div>
@@ -152,12 +178,19 @@ $(document).ready(function() {
 	      <div class="modal-body" id="modal_body">
 	      	<div class="row" style="padding: 15px;">
 	      		<div>
+	      			
 		        	<form id="add_f_price_form">	        	
 						{% csrf_token %}						    
-			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price Type" name="price_type" required/></div>
-			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price" name="price" required/></div>
-			        	<div class="col-sm-offset-6 col-sm-6">
-			        		
+			        	<div class="col-sm-6">
+			        		<input type="text" class="form-control" placeholder="Price Type" name="price_type" required/>
+			        		<span class="help-block"></span>
+			        	</div>
+			        	
+			        	<div class="col-sm-6">
+			        		<input type="text" class="form-control" placeholder="Price" name="price" required/>
+			        		<span class="help-block"></span>
+			        	</div>
+			        	<div class="col-sm-offset-6 col-sm-6">			        		
 			        		<button type="submit" id="add_f_price" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Add Fixed Price</button>
 			        	</div>
 		        	</form>
@@ -167,6 +200,68 @@ $(document).ready(function() {
 	      </div>
 	       <input type="hidden" id="hidden_field_fixed" data-item-id="{{item_id}}" data-vendor-id="{{vendor_id}}" >
 	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	</div>
+	
+	<div id="delete_fixedcost" class=" modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Confirmation</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<div>
+	      			<p>Are you sure you want to delete?</p>		        
+		        </div>
+	      </div>
+	      
+	      <div class="modal-footer">
+	      	<form id="del_fixedcost">
+	      		
+	      		<input type="hidden" id="hidden_id_fix" >
+				<button type="submit"  class="btn btn-default btn-primary ok_button ok_button_fixed" >Ok</button>
+				 
+			</form> 
+	      	
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	</div>
+	
+	<div id="delete_variablecost" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Confirmation</h4>
+	      </div>
+	      <div class="modal-body" id="modal_body">
+	      	<div class="row" style="padding: 15px;">
+	      		<div>
+	      			<p>Are you sure you want to delete?</p>		
+	      			        
+		        </div>
+	      </div>
+	       
+	      <div class="modal-footer">
+	      	<form id="del_variablecost">
+	      	
+	      		<input type="hidden" id="hidden_id_var" >
+				<button type="submit" class="btn btn-default btn-primary ok_button ok_button_variable" >Ok</button>
+				
+			</form>      	
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 	      </div>
 	    </div>
@@ -188,8 +283,14 @@ $(document).ready(function() {
 	      		<div>
 			      	<form id="add_v_price_form">
 			      		{% csrf_token %}		
-			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Quantity" name="quantity" required/></div>
-			        	<div class="col-sm-6"><input type="text" class="form-control" placeholder="Price (per unit)" name="price" required/></div>
+			        	<div class="col-sm-6">
+			        		<input type="text" class="form-control" placeholder="Quantity" name="quantity" required/>
+			        		<span class="help-block"></span>	
+			        	</div>
+			        	<div class="col-sm-6">
+			        		<input type="text" class="form-control" placeholder="Price (per unit)" name="price" required/>
+			        		<span class="help-block"></span>
+			        	</div>
 			        	<div class="col-sm-offset-6 col-sm-6">
 			        		<button type="submit" id="add_v_price" class="btn btn-default btn-primary" style="float: right;margin-top: 15px;">Add Variable Price</button>
 			        	</div>
