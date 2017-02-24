@@ -400,8 +400,7 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           url: '/cost/',
           data: {"variablecost_id":h},
           success: function (data) {
-        	  $('#delete_variablecost').modal('toggle');
-        	  
+        	  $('#delete_variablecost').modal('toggle');        	  
         	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>Data has been deleted successfully..</div>');
               window.setTimeout(function() {
                     $(".alert").fadeTo(500, 0).slideUp(500, function(){

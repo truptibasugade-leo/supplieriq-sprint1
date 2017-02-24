@@ -92,9 +92,6 @@ class VendorSerializer(serializers.Serializer):
     address = serializers.SerializerMethodField('get_vendor_address')
     phone = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
-#     fixed_cost = serializers.SerializerMethodField('get_item_fixed_cost')
-#     variable_cost = serializers.SerializerMethodField('get_item_variable_cost')
-    
     class Meta(object):
         model = Vendor
         fields = (
@@ -148,7 +145,6 @@ class VendorSerializer(serializers.Serializer):
                 vc.append(q2)
             if vc:
                 price_details['variable_cost_'+str(x['id'])] = vc
-#         print price_details
         return price_details;   
         
 class AddressSerializer(serializers.Serializer):
@@ -182,10 +178,7 @@ class ItemSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     erp_item_code = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
-#     vendor = VendorSerializer(read_only=True, many=True)
     vendor = serializers.SerializerMethodField('get_item_vendor_object')
-#     fixed_cost_item = serializers.SerializerMethodField('get_item_fixed_cost')
-#     variable_cost_item = serializers.SerializerMethodField('get_item_variable_cost')
     class Meta(object):
         model = Vendor
         fields = (
@@ -197,11 +190,10 @@ class ItemSerializer(serializers.Serializer):
     
     def get_item_vendor_object(self,obj):
         zz = []
-        for y in obj.vendor.all():
+        for y in obj.vendor.filter(company=obj.company):
             x = VendorSerializer(y)
             py_dict = x.data
             fixed_cost_item = self.get_item_fixed_cost(obj,y)            
-#             py_dict.update({'fixed_cost':fixed_cost_item})
             variable_cost_item = self.get_item_variable_cost(obj,y)
             py_dict.update({'price': [{'fixed_cost':fixed_cost_item},{'variable_cost':variable_cost_item}]})
             zz.append(py_dict)
@@ -336,7 +328,7 @@ class VariableCostSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         """
-        Purpose: To validate FixedCost serializers.
+        Purpose: To validate VariableCost serializers.
         :param self: Context Object
         :param attrs: Dictionary containing the key as field name & it's value
         :param source: Field name

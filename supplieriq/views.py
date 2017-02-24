@@ -24,7 +24,7 @@ from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSeriali
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import Vendor,Company, Item, Address,Price,FixedCost,VariableCost,ItemVendor
+from supplieriq.models import Vendor,Company, Item, Address,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
 from django.shortcuts import render_to_response
 import uuid 
 from django.conf import settings
@@ -118,7 +118,11 @@ class VendorsAPI(APIView):
             serializer = VendorSerializer(obj)    
             return Response({'serializer':serializer.data},template_name="vendor/vendor_details.html")
         except:
-            queryset = Vendor.objects.all()
+            try:
+                objs= UserCompanyModel.objects.filter(user=request.user).first()
+                queryset = Vendor.objects.filter(company_id = objs.company_id)
+            except:
+                queryset = Vendor.objects.all()            
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = VendorSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="vendor/vendor_list.html")
@@ -152,7 +156,11 @@ class ItemsAPI(APIView):
             print serializer.data                        
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
-            queryset = Item.objects.all()
+            try:
+                objs= UserCompanyModel.objects.filter(user=request.user).first()
+                queryset = Item.objects.filter(company_id = objs.company_id)
+            except:
+                queryset = Item.objects.all()
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = ItemSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="item/item_list.html")
