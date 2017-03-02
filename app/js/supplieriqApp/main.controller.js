@@ -101,13 +101,14 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
 		});
 	});
 	
-	$('#run_match_form').on('submit', function (e) {
+	$('.price_col').on('click', function (e) {
         e.preventDefault();
-        var data = $('#run_match_form').serializeArray();
+        var iv = $(this).data('itemvendor-id');        
+        var q = $(this).data('quantity');
         $.ajax({
           type: 'get',
           url: '/runmatch/',
-          data: data,
+          data: {'itemvendor':iv,'quantity':q},
           success: function (data) {
         	  $("#f_c_cal").empty();
         	  $("#v_c_cal").empty();

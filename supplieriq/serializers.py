@@ -343,7 +343,6 @@ class VariableCostSerializer(serializers.Serializer):
             error = "Invalid data.Quantity has to be a number."
             raise serializers.ValidationError(error) 
         else:
-            import ipdb;ipdb.set_trace()
             try:       
                 queryset= VariableCost.objects.filter(itemvendor=self.initial_data['itemvendor'],quantity=attrs.get('quantity'))                
             except:

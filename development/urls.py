@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from supplieriq import views
+from supplieriqmatch import views
 from rest_framework import routers
 router = routers.DefaultRouter()
 admin.autodiscover()
@@ -24,6 +25,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^', include('supplieriq.urls')),
+    url(r'^match/', include('supplieriqmatch.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 urlpatterns += router.urls

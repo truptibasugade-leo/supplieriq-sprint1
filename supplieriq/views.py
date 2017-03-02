@@ -285,10 +285,10 @@ class RunMatchAPI(APIView):
 #             print serializer.data 
             return Response(json.dumps(cost))
         except:
-            queryset = ItemVendor.objects.all()
-            serializer = ItemVendorSerializer(queryset, many=True)    
+            queryset = Item.objects.all()
+#             serializer = ItemVendorSerializer(queryset, many=True)    
                      
-            return Response({'serializer':serializer.data},template_name="run_match.html")
+            return Response({'serializer':queryset},template_name="run_match.html")
 
 class QuoteAPI(APIView):
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)

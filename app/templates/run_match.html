@@ -8,19 +8,23 @@
 		<div class="row">
 			<h3><strong>Run Match</strong></h3>
 			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
-				<form class="form-horizontal" id="run_match_form">
+				<form class="form-horizontal" action="/match/cost_parameter/" method="GET" id="run_match_form">
 					<div class="row">						
 						<div class="col-sm-3">	
-							<label>Choose Item & Vendor:</label>
-							<select class="form-control" name="itemvendor">
+							<label>Choose Item</label>
+							<select class="form-control" name="item">
 							{%for data in serializer%}
-							  <option value="{{data.item_vendor.itemvendor}}">Item: {{data.item.item_name}}, Vendor: {{data.vendor.vendor_name}}</option>							
+							  <option value="{{data.id}}">{{data.name}}</option>							
 							{% endfor%}
 							</select>
 						</div>
+						<!-- <div class="col-sm-3">
+							<label>Target Price</label>	
+							<input name="target_price" class="form-control" type="text" placeholder="Target Price" required></input>
+						</div> -->
 						<div class="col-sm-3">
 							<label>Quantity</label>	
-							<input name="quantity" class="form-control" type="text" placeholder="quantity" required></input>
+							<input name="quantity" class="form-control" type="text" placeholder="Quantity" required></input>
 						</div>
 						<div class="col-sm-12">						        
 					        &nbsp;						        

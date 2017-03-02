@@ -8,3 +8,4 @@ development/__init__.pyc
 supplieriq/migrations/*
 env/*
 development/wsgi.py
+supplieriqmatch/*.pyc
