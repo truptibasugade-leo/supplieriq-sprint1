@@ -106,7 +106,7 @@ class VendorSerializer(serializers.Serializer):
     
     def get_vendor_address(self, obj):
         try:
-            addrObj = Address.objects.get(id=obj.id)
+            addrObj = Address.objects.get(vendor_id=obj.id)
             l1 = str(addrObj.address1) + ' ' + str(addrObj.address2)
             l1 = filter(None, l1)
             l2 = str(addrObj.city) + ' ' + str(addrObj.state) + ' ' + str(addrObj.zipcode)
