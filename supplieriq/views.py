@@ -24,7 +24,7 @@ from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSeriali
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import Vendor,Company, Item, Address,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
+from supplieriq.models import CompanyVendor,Company, CompanyItem, Address,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
 from django.shortcuts import render_to_response
 import uuid 
 from django.conf import settings
@@ -44,7 +44,7 @@ class ObtainAuthToken(APIView):
     parser_classes = (
         parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
-    serializer_class = SignInSerializer  # AuthTokenSerializer
+    serializer_class = SignInSerializer 
     model = Token
     template_name = 'login.html'
     
@@ -114,15 +114,15 @@ class VendorsAPI(APIView):
     def get(self, request,*args, **kwargs):
         try:
             vendor_id = request.query_params['id']
-            obj = Vendor.objects.get(id=vendor_id)
+            obj = CompanyVendor.objects.get(id=vendor_id)
             serializer = VendorSerializer(obj)    
             return Response({'serializer':serializer.data},template_name="vendor/vendor_details.html")
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
-                queryset = Vendor.objects.filter(company_id = objs.company_id)
+                queryset = CompanyVendor.objects.filter(company_id = objs.company_id)
             except:
-                queryset = Vendor.objects.all()            
+                queryset = CompanyVendor.objects.all()            
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = VendorSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="vendor/vendor_list.html")
@@ -151,16 +151,16 @@ class ItemsAPI(APIView):
     def get(self, request,*args, **kwargs):
         try:            
             item_id = request.query_params['id']
-            obj = Item.objects.get(id=item_id)            
+            obj = CompanyItem.objects.get(id=item_id)            
             serializer = ItemSerializer(obj)  
             print serializer.data                        
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
-                queryset = Item.objects.filter(company_id = objs.company_id)
+                queryset = CompanyItem.objects.filter(company_id = objs.company_id)
             except:
-                queryset = Item.objects.all()
+                queryset = CompanyItem.objects.all()
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = ItemSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="item/item_list.html")
@@ -174,7 +174,7 @@ class CostAPI(APIView):
         if v_id:
             # To add new fixed cost and variable cost
             price = request.data.get('price')
-            objs=ItemVendor.objects.filter(vendor_id = v_id , item_id = i_id)     
+            objs=ItemVendor.objects.filter(companyvendor_id = v_id , companyitem_id = i_id)     
             price_type = request.data.get('price_type')
             d = request.data.copy()            
             if price_type:
@@ -265,7 +265,6 @@ class RunMatchAPI(APIView):
                 for x in f_c:
                     fixed_cost += int(x.cost)
                     cost[str(x.cost_type)] = int(x.cost)
-#             print fixed_cost
             if v_c:
                 val = v_c.values_list('quantity','cost')
                 cc =filter(lambda x: int(x[0]) <= int(qty),val)
@@ -273,21 +272,16 @@ class RunMatchAPI(APIView):
                 closest =[b for b in cc if int(b[0]) == m]
                 variable_cost = int(closest[0][1]) * int(qty)
                 cost['Price (per unit)'] = closest[0][1]
-#             print variable_cost
             total= fixed_cost + variable_cost
-#             print total
             cost['Quantity'] = qty            
             cost['Fixed Price'] = fixed_cost
             cost['Variable Price'] =variable_cost
             cost[ 'Total']=total
-            print cost
-#             serializer = ItemVendorSerializer(queryset, many=True)
-#             print serializer.data 
             return Response(json.dumps(cost))
         except:
-            queryset = Item.objects.all()
-#             serializer = ItemVendorSerializer(queryset, many=True)    
-                     
+            zzzz=request.user.usercompanymodel_set.all()
+            qqq =zzzz[0]
+            queryset = CompanyItem.objects.filter(company=qqq.company)
             return Response({'serializer':queryset},template_name="run_match.html")
 
 class QuoteAPI(APIView):
@@ -297,9 +291,9 @@ class QuoteAPI(APIView):
         try:
             v_id = request.query_params['vendorid']
             i_id = request.query_params['itemid']
-            i_obj = Item.objects.get(id= i_id)
-            v_obj = Vendor.objects.get(id= v_id)
-            v_i_id = ItemVendor.objects.get(vendor=v_id,item=i_id)
+            i_obj = CompanyItem.objects.get(id= i_id)
+            v_obj = CompanyVendor.objects.get(id= v_id)
+            v_i_id = ItemVendor.objects.get(companyvendor=v_id,companyitem=i_id)
             v_obj.send_quote_id = uuid.uuid4()
             v_obj.link_expiration_date = datetime.datetime.now()
             v_obj.save()
@@ -315,12 +309,12 @@ class QuoteAPI(APIView):
             send_quote_id = request.query_params['send_quote_id']
             obj=ItemVendor.objects.get(id =v_i_id)  
             try:
-                v_ob = Vendor.objects.get(id=obj.vendor.id,send_quote_id=send_quote_id)
+                v_ob = CompanyVendor.objects.get(id=obj.companyvendor.id,send_quote_id=send_quote_id)
                 if (datetime.datetime.now(timezone.utc) - v_ob.link_expiration_date) > datetime.timedelta(1): 
                     return Response({'serializer':'This link has been expired. Please send the Quote request again.','status':'expired'},template_name="update_cost.html")
             except:
                 return Response({'serializer':'Unauthorized..!! You cannot access this link.','status':'unauthorized'},template_name="update_cost.html")
             serializer = CostSerializer(obj)
-            return Response({'serializer':serializer.data,'vendor_id':obj.vendor_id,'item_id':obj.item_id},template_name="update_cost.html")
+            return Response({'serializer':serializer.data,'vendor_id':obj.companyvendor_id,'item_id':obj.companyitem_id},template_name="update_cost.html")
 
     

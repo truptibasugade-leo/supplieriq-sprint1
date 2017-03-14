@@ -29,7 +29,7 @@ class Account(models.Model):
     expiry_date = models.DateField(null=True, blank=True)
     
     
-class Vendor(models.Model):
+class CompanyVendor(models.Model):
 
     """
     Purpose: Describes the schema required to maintain Vendor details
@@ -46,7 +46,7 @@ class Vendor(models.Model):
     def __unicode__(self):
         return self.name
     
-class Item(models.Model):
+class CompanyItem(models.Model):
 
     """
     Purpose: Describes the schema required to maintain Item details
@@ -57,7 +57,7 @@ class Item(models.Model):
     description = models.CharField(max_length=20, null=True, blank=True)
     company = models.ForeignKey('Company', null=True, blank=True)  
     target_price = models.DecimalField(max_digits=10, decimal_places=2,default=Decimal('0.00'))
-    vendor = models.ManyToManyField('Vendor')
+    vendor = models.ManyToManyField('CompanyVendor')
     def __unicode__(self):
         return self.name
  
@@ -65,7 +65,7 @@ class Address(models.Model):
     """
     Purpose: Model for Address.
     """
-    vendor = models.ForeignKey('Vendor', null=True, blank=True)
+    vendor = models.ForeignKey('CompanyVendor', null=True, blank=True)
  
     address1 = models.CharField(max_length=255, null=True, blank=True)
  
@@ -94,15 +94,15 @@ class Address(models.Model):
 
 
 class ItemVendor(models.Model):
-    item = models.ForeignKey('Item') 
-    vendor = models.ForeignKey('Vendor') 
+    companyitem = models.ForeignKey('CompanyItem') 
+    companyvendor = models.ForeignKey('CompanyVendor') 
     
     def __unicode__(self):
-        return 'Item: ' + self.item.name + ' Vendor: ' +self.vendor.name
+        return 'Item: ' + self.companyitem.name + ' Vendor: ' +self.companyvendor.name
 
     class Meta:
         managed = False
-        db_table = 'supplieriq_item_vendor'
+        db_table = 'supplieriq_companyitem_vendor'
         
 
 class FixedCost(models.Model):
@@ -141,3 +141,26 @@ class UserCompanyModel(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+    
+# class CompanyItemModel(models.Model):
+#     """ Model to relate Item and Company """
+#     item = models.ForeignKey(Item)
+#     company = models.ForeignKey(Company)
+# 
+#     class Meta:
+#         unique_together = ("item","company")
+# 
+#     def __unicode__(self):
+#         return str(self.id)
+# 
+# class CompanyVendorModel(models.Model):
+#     """ Model to relate Vendor and Company """
+#     vendor = models.ForeignKey(Vendor)
+#     company = models.ForeignKey(Company)
+# 
+#     class Meta:
+#         unique_together = ("vendor","company")
+# 
+#     def __unicode__(self):
+#         return str(self.id)
+

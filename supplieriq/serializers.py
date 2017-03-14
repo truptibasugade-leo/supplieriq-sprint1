@@ -19,7 +19,7 @@ from django.core.validators import RegexValidator
 from django.core.paginator import Page
 from django.core.serializers.json import DjangoJSONEncoder
 import logging
-from supplieriq.models import Vendor,Company, Address, Item,Price,FixedCost,VariableCost,ItemVendor
+from supplieriq.models import CompanyVendor,Company, Address, CompanyItem,Price,FixedCost,VariableCost,ItemVendor
 
 logger = logging.getLogger('file_debug_log')
 
@@ -43,9 +43,6 @@ class SignInSerializer(serializers.Serializer):
         max_length=PASSWORD_MAX_LENGTH,
         style={'input_type': 'password', 'placeholder': 'Password'}
     )
-#     email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH)
-# # 
-#     password = serializers.CharField(max_length=PASSWORD_MAX_LENGTH)
 
     def validate(self, attrs):
         """
@@ -93,7 +90,7 @@ class VendorSerializer(serializers.Serializer):
     phone = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
     class Meta(object):
-        model = Vendor
+        model = CompanyVendor
         fields = (
             'vendorid','name', 'erp_vendor_code','phone', 'email','company',
         )
@@ -122,7 +119,7 @@ class VendorSerializer(serializers.Serializer):
     def get_item_fixed_cost(self, obj):
         price_details = {}
         for x in obj.item_set.all():
-            ob = ItemVendor.objects.filter(item_id=x.id,vendor_id=obj.id)
+            ob = ItemVendor.objects.filter(companyitem_id=x.id,companyvendor_id=obj.id)
             for zz in ob:
                 fc_objs = FixedCost.objects.filter(itemvendor=zz.id)
                 q1 = {}
@@ -130,7 +127,6 @@ class VendorSerializer(serializers.Serializer):
                     q1[y.cost_type] = y.cost
                 if q1:                 
                     price_details['fixed_cost_'+str(zz.id)] = q1
-#         print price_details
         return price_details; 
        
     def get_item_variable_cost(self, obj):
@@ -180,7 +176,7 @@ class ItemSerializer(serializers.Serializer):
     description = serializers.CharField(read_only=True)
     vendor = serializers.SerializerMethodField('get_item_vendor_object')
     class Meta(object):
-        model = Vendor
+        model = CompanyVendor
         fields = (
             'itemid','name', 'erp_item_code','description','price','address'
         )
@@ -202,7 +198,7 @@ class ItemSerializer(serializers.Serializer):
         
         price_details = []
         for x in obj.itemvendor_set.values():
-            if x['vendor_id'] == vendor_obj.id:
+            if x['companyvendor_id'] == vendor_obj.id:
                 fc_objs = FixedCost.objects.filter(itemvendor=x['id'])
                 q1 = {}
                 for y in fc_objs:
@@ -214,7 +210,7 @@ class ItemSerializer(serializers.Serializer):
     def get_item_variable_cost(self, obj,vendor_obj):
         price_details = []
         for x in obj.itemvendor_set.values():
-            if x['vendor_id'] == vendor_obj.id:
+            if x['companyvendor_id'] == vendor_obj.id:
                 vc_objs = VariableCost.objects.filter(itemvendor=x['id'])
                 vc = []
                 for z in vc_objs:
@@ -237,16 +233,16 @@ class ItemVendorSerializer(serializers.Serializer):
     class Meta(object):
         model = ItemVendor
         fields = (
-            'item','vendor',
+            'companyitem','companyvendor',
         )
     def get_item_vendor_object(self, obj):        
         return {"itemvendor":obj.id} 
     
     def get_vendor_object(self, obj):        
-        return {"vendor_name":obj.vendor.name,"vendor_id": obj.vendor.id} 
+        return {"vendor_name":obj.companyvendor.name,"vendor_id": obj.companyvendor.id} 
     
     def get_item_object(self, obj):        
-        return {"item_name":obj.item.name,"item_id": obj.item.id} ; 
+        return {"item_name":obj.companyitem.name,"item_id": obj.companyitem.id} ; 
 
 class CostSerializer(serializers.Serializer):
     fixed_cost_item = serializers.SerializerMethodField('get_item_fixed_cost')
