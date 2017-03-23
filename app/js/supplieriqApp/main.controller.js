@@ -81,13 +81,34 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
 	});
 	
 	$(".send_quote").on('click',function(e){
-		var vendor_id = $(this).data('vendor-id')
-		var item_id = $(this).data('item-id')
+		var vendor_id = $(this).data('vendor-id');
+		var item_id = $(this).data('item-id');
+		var action = "open modal";
 		$.ajax({
           type: 'get',
           url: '/quote/',
-          data: {"vendorid":vendor_id, "itemid" :item_id},
+          data: {"vendorid":vendor_id, "itemid" :item_id, "action" :action},
           success: function (data) {
+        	  $("#link").val(data.serializer);
+        	  $(".copy").attr('data-clipboard-text',data.serializer)
+        	  $(".send_mail").attr('data-vendor-id',vendor_id)
+        	  $(".send_mail").attr('data-item-id',item_id)
+        	  $('#send_quote_popup').modal({
+	      	        show: true
+	      	    });
+          }
+		});
+	});
+	$(".send_mail").on('click',function(e){
+		var vendor_id = $(this).data('vendor-id');
+		var item_id = $(this).data('item-id');
+		var action = "send mail";
+		$.ajax({
+          type: 'get',
+          url: '/quote/',
+          data: {"vendorid":vendor_id, "itemid" :item_id, "action" :action},
+          success: function (data) {
+        	  $('#send_quote_popup').modal('toggle');
         	  $("#result").html('<div class="alert alert-success"><button type="button" class="close">&nbsp;×</button>'+data.serializer+'</div>');
               window.setTimeout(function() {
                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
@@ -100,7 +121,6 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
           }
 		});
 	});
-	
 	$('.price_col').on('click', function (e) {
         e.preventDefault();
         var iv = $(this).data('itemvendor-id');        

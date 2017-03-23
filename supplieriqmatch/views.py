@@ -37,7 +37,10 @@ class MatchAPI(APIView):
                         closest =[b for b in cc if int(b[0]) == m]
                         variable_cost = int(closest[0][1]) * int(qty)
                     except:
-                        pass
+                        cc =filter(lambda x: int(x[0]) >= int(qty),val)
+                        m = min( [ int(x[0]) for x in cc])
+                        closest =[b for b in cc if int(b[0]) == m]
+                        variable_cost = int(closest[0][1]) * int(qty)
                 if variable_cost != 0 and fixed_cost != 0:
                     zzzz=request.user.usercompanymodel_set.all()
                     qqq =zzzz[0]

@@ -252,7 +252,7 @@ class RunMatchAPI(APIView):
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):   
-        try:     
+        try:    
             cost = {}
             itemvendor = request.query_params['itemvendor']            
             qty = request.query_params['quantity']            
@@ -266,11 +266,18 @@ class RunMatchAPI(APIView):
                     fixed_cost += int(x.cost)
                     cost[str(x.cost_type)] = int(x.cost)
             if v_c:
-                val = v_c.values_list('quantity','cost')
-                cc =filter(lambda x: int(x[0]) <= int(qty),val)
-                m = max( [ int(x[0]) for x in cc])
-                closest =[b for b in cc if int(b[0]) == m]
-                variable_cost = int(closest[0][1]) * int(qty)
+                try:
+                    val = v_c.values_list('quantity','cost')
+                    cc =filter(lambda x: int(x[0]) <= int(qty),val)
+                    m = max( [ int(x[0]) for x in cc])
+                    closest =[b for b in cc if int(b[0]) == m]
+                    variable_cost = int(closest[0][1]) * int(qty)
+                except:
+                    val = v_c.values_list('quantity','cost')
+                    cc =filter(lambda x: int(x[0]) >= int(qty),val)
+                    m = min( [ int(x[0]) for x in cc])
+                    closest =[b for b in cc if int(b[0]) == m]
+                    variable_cost = int(closest[0][1]) * int(qty)
                 cost['Price (per unit)'] = closest[0][1]
             total= fixed_cost + variable_cost
             cost['Quantity'] = qty            
@@ -291,19 +298,29 @@ class QuoteAPI(APIView):
         try:
             v_id = request.query_params['vendorid']
             i_id = request.query_params['itemid']
+            action = request.query_params['action']
             i_obj = CompanyItem.objects.get(id= i_id)
             v_obj = CompanyVendor.objects.get(id= v_id)
             v_i_id = ItemVendor.objects.get(companyvendor=v_id,companyitem=i_id)
             v_obj.send_quote_id = uuid.uuid4()
             v_obj.link_expiration_date = datetime.datetime.now()
             v_obj.save()
-            
             domain = request.META['HTTP_HOST']
-            text_content = 'To Update the price for Item - '+str(i_obj.name)+'<br/><a href="http://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)+'">Please Click this link. </a>'
-            email = EmailMessage(subject='Quote Request',body=text_content,from_email=settings.DEFAULT_FROM_EMAIL,to=[str(v_obj.email)])
-            email.content_subtype = "html"
-            email.send()
-            return Response({'serializer':'Link has been sent to the email address.'})
+            if action == 'open modal':
+                if domain == '172.16.0.109:8000':
+                    link = 'http://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)
+                else:
+                    link = 'https://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)
+                return Response({'serializer':link})
+            else:
+                if domain == '172.16.0.109:8000':
+                    text_content = 'To Update the price for Item - '+str(i_obj.name)+'<br/><a href="http://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)+'">Please Click this link. </a>'
+                else:
+                    text_content = 'To Update the price for Item - '+str(i_obj.name)+'<br/><a href="https://'+str(domain)+'/quote/?vendoritem='+str(v_i_id.id)+'&send_quote_id='+str(v_obj.send_quote_id)+'">Please Click this link. </a>'
+                email = EmailMessage(subject='Quote Request',body=text_content,from_email=settings.DEFAULT_FROM_EMAIL,to=[str(v_obj.email)])
+                email.content_subtype = "html"
+                email.send()
+                return Response({'serializer':'Link has been sent to the email address.'})
         except: 
             v_i_id = request.query_params['vendoritem']
             send_quote_id = request.query_params['send_quote_id']

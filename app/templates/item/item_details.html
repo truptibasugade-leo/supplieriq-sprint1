@@ -4,7 +4,11 @@
 {% block content%}
 <script type="text/javascript">
 $(document).ready(function() {
-	$('#example1').DataTable();
+	 $('#example1').DataTable();	
+	 $(".modal").on("shown.bs.modal", function() {
+    	  console.log('a', Clipboard, $('#copy'), $("#link").val());
+    	  var clipboard = new Clipboard('#copy')
+    	});
 });
 </script>
 <div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
@@ -220,5 +224,36 @@ $(document).ready(function() {
 	
 	  </div>
 	</div>
+	<div id="send_quote_popup" class="modal fade" role="dialog" >
+	  <div class="modal-dialog">
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Price Details</h4>
+	      </div>
+	      <div class="modal-body row" id="send_quote_modal_body" onload="InitEditable();">
+	      	<div>
+		        <h2 >To update the price details either copy paste the below link or send it to your mail id.</h2>
+		        <div class="col-sm-10">
+			       <input type="text" id="link" class="form-control" readonly/> 
+			        <!-- <button type="button" class="btn btn-primary copy" data-clipboard-action="copy" data-clipboard-target="#link" name="submit" id="copy-button" >Copy</button> -->
+			         <!-- <input type="text" class="form-control" id="copy-input" value="Copied successfully!"/> -->			        
+			    </div>
+			    <div class="col-sm-2">
+			    	<a href="javascript:void(0);" id="copy" data-clipboard-target="#link" class="btn btn-primary">Copy</a>
+			    </div>
+	        </div>
+	      </div>
+	     
+	      <div class="modal-footer">
+	      	<button type="button" class="btn btn-primary send_mail">Send</button>	      	
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>
+	
 {% endblock %}
 
