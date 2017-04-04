@@ -19,7 +19,7 @@ from django.core.validators import RegexValidator
 from django.core.paginator import Page
 from django.core.serializers.json import DjangoJSONEncoder
 import logging
-from supplieriq.models import CompanyVendor,Company, Address, CompanyItem,Price,FixedCost,VariableCost,ItemVendor
+from supplieriq.models import CompanyVendor,Company, VendorAddress, CompanyItem,Price,FixedCost,VariableCost,ItemVendor
 
 logger = logging.getLogger('file_debug_log')
 
@@ -103,7 +103,7 @@ class VendorSerializer(serializers.Serializer):
     
     def get_vendor_address(self, obj):
         try:
-            addrObj = Address.objects.get(vendor_id=obj.id)
+            addrObj = VendorAddress.objects.get(vendor_id=obj.id)
             l1 = str(addrObj.address1) + ' ' + str(addrObj.address2)
             l1 = filter(None, l1)
             l2 = str(addrObj.city) + ' ' + str(addrObj.state) + ' ' + str(addrObj.zipcode)
@@ -143,7 +143,7 @@ class VendorSerializer(serializers.Serializer):
                 price_details['variable_cost_'+str(x['id'])] = vc
         return price_details;   
         
-class AddressSerializer(serializers.Serializer):
+class VendorAddressSerializer(serializers.Serializer):
     
     vendor = VendorSerializer(read_only=True, many=True)
  
@@ -160,7 +160,7 @@ class AddressSerializer(serializers.Serializer):
     zipcode = serializers.CharField(read_only=True)
     
     class Meta(object):
-        model = Address
+        model = VendorAddress
         fields = (
             'address1','address2', 'city','state','country','zipcode',
         )        
@@ -292,7 +292,7 @@ class FixedCostSerializer(serializers.Serializer):
     """
     itemvendor = ItemVendorSerializer(read_only=True, many=True)
     price_type = serializers.CharField()
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    price = serializers.DecimalField(max_digits=10, decimal_places=6)
 
     def validate(self, attrs):
         """
@@ -320,7 +320,7 @@ class VariableCostSerializer(serializers.Serializer):
     """
     itemvendor = ItemVendorSerializer(read_only=True, many=True)
     quantity = serializers.CharField()
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    price = serializers.DecimalField(max_digits=10, decimal_places=6)
 
     def validate(self, attrs):
         """

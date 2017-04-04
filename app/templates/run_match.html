@@ -18,10 +18,14 @@
 							{% endfor%}
 							</select>
 						</div>
-						<!-- <div class="col-sm-3">
-							<label>Target Price</label>	
-							<input name="target_price" class="form-control" type="text" placeholder="Target Price" required></input>
-						</div> -->
+						<div class="col-sm-3">
+							<label>Company Address</label>
+							<select class="form-control" name="company_address">
+							{%for data in company_address%}
+							  <option value="{{data.id}}">{{data.get_address}}</option>							
+							{% endfor%}
+							</select>
+						</div>
 						<div class="col-sm-3">
 							<label>Quantity</label>	
 							<input name="quantity" class="form-control" type="text" placeholder="Quantity" required></input>

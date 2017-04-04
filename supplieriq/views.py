@@ -24,7 +24,7 @@ from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSeriali
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import CompanyVendor,Company, CompanyItem, Address,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
+from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
 from django.shortcuts import render_to_response
 import uuid 
 from django.conf import settings
@@ -52,7 +52,8 @@ class ObtainAuthToken(APIView):
         serializer = self.serializer_class()
         if request.user.is_authenticated():
             token, created = Token.objects.get_or_create(user=request.user)  
-            return Response({'serializer': serializer,'token': token.key,'userid': request.user.id,}, template_name='home.html')
+            vv =request.user.usercompanymodel_set.first()
+            return Response({'serializer': serializer,'token': token.key,'userid': request.user.id,'company':vv.company.name}, template_name='home.html')
         
         return Response({'serializer': serializer})
     
@@ -63,8 +64,9 @@ class ObtainAuthToken(APIView):
             token, created = Token.objects.get_or_create(user=user)  
             new_user = authenticate(username=user.username, password=request.data.get('password'))
             auth_login(request, new_user)
+            vv =request.user.usercompanymodel_set.first()
             response = Response({'serializer':serializer.data,'token': token.key,
-                                 'userid': user.id,
+                                 'userid': user.id,'company':vv.company.name
             }, template_name='home.html')
 #             response.set_cookie('authorization', token.key, max_age=MAX_AGE, expires=EXPIRES)
 #             response.set_cookie('authenticate', token.key, max_age=MAX_AGE, expires=EXPIRES)        
@@ -263,33 +265,34 @@ class RunMatchAPI(APIView):
             variable_cost = 0
             if f_c:
                 for x in f_c:
-                    fixed_cost += int(x.cost)
-                    cost[str(x.cost_type)] = int(x.cost)
+                    fixed_cost += float(x.cost)
+                    cost[str(x.cost_type)] = float(x.cost)
             if v_c:
                 try:
                     val = v_c.values_list('quantity','cost')
-                    cc =filter(lambda x: int(x[0]) <= int(qty),val)
-                    m = max( [ int(x[0]) for x in cc])
-                    closest =[b for b in cc if int(b[0]) == m]
-                    variable_cost = int(closest[0][1]) * int(qty)
+                    cc =filter(lambda x: float(x[0]) <= float(qty),val)
+                    m = max( [ float(x[0]) for x in cc])
+                    closest =[b for b in cc if float(b[0]) == m]
+                    variable_cost = float(closest[0][1]) * float(qty)
                 except:
                     val = v_c.values_list('quantity','cost')
-                    cc =filter(lambda x: int(x[0]) >= int(qty),val)
-                    m = min( [ int(x[0]) for x in cc])
-                    closest =[b for b in cc if int(b[0]) == m]
-                    variable_cost = int(closest[0][1]) * int(qty)
+                    cc =filter(lambda x: float(x[0]) >= float(qty),val)
+                    m = min( [ float(x[0]) for x in cc])
+                    closest =[b for b in cc if float(b[0]) == m]
+                    variable_cost = float(closest[0][1]) * float(qty)
                 cost['Price (per unit)'] = closest[0][1]
-            total= fixed_cost + variable_cost
+            total= round(fixed_cost,2) + round(variable_cost,2)
             cost['Quantity'] = qty            
-            cost['Fixed Price'] = fixed_cost
-            cost['Variable Price'] =variable_cost
-            cost[ 'Total']=total
+            cost['Fixed Price'] = round(fixed_cost,2)
+            cost['Variable Price'] =round(variable_cost,2)
+            cost[ 'Total']=float(total)
             return Response(json.dumps(cost))
         except:
             zzzz=request.user.usercompanymodel_set.all()
+            company_address = zzzz[0].company.location_set.all()
             qqq =zzzz[0]
             queryset = CompanyItem.objects.filter(company=qqq.company)
-            return Response({'serializer':queryset},template_name="run_match.html")
+            return Response({'serializer':queryset,'company_address':company_address},template_name="run_match.html")
 
 class QuoteAPI(APIView):
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)

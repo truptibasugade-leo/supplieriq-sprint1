@@ -5,6 +5,9 @@ import uuid
 from datetime import datetime 
 from decimal import Decimal   
 from django.contrib.auth.models import User
+from django_countries.fields import CountryField
+from django_countries import countries
+from supplieriq.countries import COUNTRIES
 
 class Company(models.Model):
 
@@ -61,9 +64,9 @@ class CompanyItem(models.Model):
     def __unicode__(self):
         return self.name
  
-class Address(models.Model):
+class VendorAddress(models.Model):
     """
-    Purpose: Model for Address.
+    Purpose: Model for VendorAddress.
     """
     vendor = models.ForeignKey('CompanyVendor', null=True, blank=True)
  
@@ -74,10 +77,17 @@ class Address(models.Model):
     city = models.CharField(max_length=255, null=True, blank=True)
  
     state = models.CharField(max_length=255, null=True, blank=True)
- 
-    country = models.CharField(max_length=255, null=True, blank=True)
+    
+    county_choice = COUNTRIES
+    
+    country = models.CharField(max_length=2,choices=county_choice,default='AD')
  
     zipcode = models.CharField(max_length=6, null=True, blank=True)
+    
+    latitude = models.DecimalField(max_digits=9, decimal_places=6,default=Decimal('0.00'))
+
+    longitude = models.DecimalField(max_digits=9, decimal_places=6,default=Decimal('0.00'))
+
  
     def get_address(self):
         """
@@ -142,25 +152,44 @@ class UserCompanyModel(models.Model):
     def __unicode__(self):
         return str(self.id)
     
-# class CompanyItemModel(models.Model):
-#     """ Model to relate Item and Company """
-#     item = models.ForeignKey(Item)
-#     company = models.ForeignKey(Company)
-# 
-#     class Meta:
-#         unique_together = ("item","company")
-# 
-#     def __unicode__(self):
-#         return str(self.id)
-# 
-# class CompanyVendorModel(models.Model):
-#     """ Model to relate Vendor and Company """
-#     vendor = models.ForeignKey(Vendor)
-#     company = models.ForeignKey(Company)
-# 
-#     class Meta:
-#         unique_together = ("vendor","company")
-# 
-#     def __unicode__(self):
-#         return str(self.id)
+class Location(models.Model):
+    """
+    Purpose: Model for Company Address.
+    """
+    company = models.ForeignKey('Company', null=True, blank=True)
+ 
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    
+    address1 = models.CharField(max_length=255, null=True, blank=True)
+ 
+    address2 = models.CharField(max_length=255, null=True, blank=True)
+    
+    address3 = models.CharField(max_length=255, null=True, blank=True)
+ 
+    city = models.CharField(max_length=255, null=True, blank=True)
+ 
+    state = models.CharField(max_length=255, null=True, blank=True)
+    
+    county_choice = COUNTRIES
+    
+    country = models.CharField(max_length=2,choices=county_choice,default='AD')
+ 
+    zipcode = models.CharField(max_length=6, null=True, blank=True)
+    
+    latitude = models.DecimalField(max_digits=9, decimal_places=6,default=Decimal('0.00'))
 
+    longitude = models.DecimalField(max_digits=9, decimal_places=6,default=Decimal('0.00'))
+
+ 
+    def get_address(self):
+        """
+        Purpose: To return string representation of address.
+        :returns: returns verbose string for the address values.
+        """
+        address_list = [self.address1, self.address2, self.city, self.state,
+                        self.country, self.zipcode]
+        address_list = filter(None, address_list)
+        return ', '.join(address_list)
+ 
+    def __unicode__(self):
+        return self.get_address()
