@@ -12,6 +12,12 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
 		window.location.replace('/items/?id='+item_id);	
 		
 	});
+	$(".po_item").click(function() {
+		
+		var po_id = $(this).data('po-id');	
+		window.location.replace('/purchase_order/?id='+po_id);	
+		
+	});
 	$('.price').click(function(){
 		var data = $(this).data('id');
 		var item_id = $(this).data('item-id');

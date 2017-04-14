@@ -19,4 +19,6 @@ urlpatterns = [
         name='runmatch'),
     url(r'^quote', views.QuoteAPI.as_view(),
         name='quote'),
+    url(r'^purchase_order', views.PurchaseOrderAPI.as_view(),
+        name='purchase_order'),
 ]

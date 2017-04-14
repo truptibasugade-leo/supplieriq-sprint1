@@ -5,10 +5,11 @@ from rest_framework.response import Response
 from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer,CostSerializer,FixedCostSerializer,VariableCostSerializer
 from django.contrib.auth.models import User
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel,Location
+from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price,FixedCost,VariableCost,ItemVendor,Location,UserCompanyModel,PurchaseOrder,ItemReceipt
 from django.shortcuts import render_to_response
 import json
-from supplieriqmatch.utils import get_lat_long,distance
+from supplieriqmatch.utils import get_lat_long,distance,calculate_quality,\
+    calculate_fixed_cost,calculate_variable_cost,calculate_delay_time
 
 
 # Create your views here.
@@ -31,20 +32,9 @@ class MatchAPI(APIView):
                 fixed_cost = 0
                 variable_cost = 0
                 if f_c:
-                    for x in f_c:
-                        fixed_cost += float(x.cost)
+                    fixed_cost = calculate_fixed_cost(f_c)
                 if v_c:
-                    val = v_c.values_list('quantity','cost')
-                    try:
-                        cc =filter(lambda x: float(x[0]) <= float(qty),val)
-                        m = max( [ float(x[0]) for x in cc])
-                        closest =[b for b in cc if float(b[0]) == m]
-                        variable_cost = float(closest[0][1]) * float(qty)
-                    except:
-                        cc =filter(lambda x: float(x[0]) >= float(qty),val)
-                        m = min( [ float(x[0]) for x in cc])
-                        closest =[b for b in cc if float(b[0]) == m]
-                        variable_cost = float(closest[0][1]) * float(qty)
+                    variable_cost = calculate_variable_cost(qty,v_c)
 
                 if variable_cost != 0 and fixed_cost != 0:
                     zzzz=request.user.usercompanymodel_set.all()
@@ -52,19 +42,32 @@ class MatchAPI(APIView):
                     if qqq.company == item.companyvendor.company:
                         total= round(fixed_cost,2) + round(variable_cost,2)                
                         serializer = VendorSerializer(item.companyvendor)
+                        
+                        # find distance
                         v_addr = item.companyvendor.vendoraddress_set.first()
-                        lat2,long2 = get_lat_long(v_addr)
+                        lat2,long2 = get_lat_long(v_addr)                        
                         if lat1 and long1 and lat2 and long2:
                             dist = distance(lat1,long1, lat2, long2)
                         else:
                             if lat1=='' or long1=='':
-                                dist = 'Incorrect Company Address'
+                                dist = 'Incorrect Company Address..!!'
                             else:
-                                dist = 'Incorrect Vendor Address'
+                                dist = 'Incorrect Vendor Address..!!'
+                        
                         zz = serializer.data                    
                         zz.update({"total price":float(total)})
                         zz.update({"distance":dist})
+                        
+                        # find quality
+                        quality = calculate_quality(item)
+
+                        #find delay
+                        delay = calculate_delay_time(item)
+                        
+                        zz.update({"quality":quality})
+                        zz.update({"delivery delay":delay})
                         zz.update({"itemvendor":item.id})
+                    
                         qq.append(zz)
             return Response({'serializer':qq,'item_id':item_id,'quantity':qty},template_name="match_results.html")
         except:
@@ -72,3 +75,4 @@ class MatchAPI(APIView):
 #             serializer = ItemVendorSerializer(queryset, many=True)    
                      
             return Response({'serializer':queryset},template_name="match_results.html")
+

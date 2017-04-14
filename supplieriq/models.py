@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django_countries.fields import CountryField
 from django_countries import countries
 from supplieriq.countries import COUNTRIES
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Company(models.Model):
 
@@ -193,3 +194,41 @@ class Location(models.Model):
  
     def __unicode__(self):
         return self.get_address()
+
+class PurchaseOrder(models.Model):
+     
+    itemvendor = models.ForeignKey('ItemVendor')
+  
+    PO_date = models.DateTimeField(default=datetime.now)
+     
+    recieve_by_date = models.DateTimeField(default=datetime.now)
+  
+    quantity = models.CharField(max_length=255, null=True, blank=True)
+    
+    unit_price = models.CharField(max_length=255, null=True, blank=True)
+    
+    total_amount = models.CharField(max_length=255, null=True, blank=True)
+    
+    erp_po_code = models.CharField(max_length=255, null=True, blank=True)
+    
+    def __unicode__(self):
+        return 'PO Date: ' + str(self.PO_date.date()) +' Item: ' + self.itemvendor.companyitem.name + ' Vendor: ' +self.itemvendor.companyvendor.name
+
+     
+class ItemReceipt(models.Model):
+     
+    itemvendor = models.ForeignKey('ItemVendor')
+     
+    date = models.DateTimeField(default=datetime.now)
+  
+    rating = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(1)])
+    
+    to_location = models.CharField(max_length=255, null=True, blank=True)
+    
+    created_from = models.ForeignKey('PurchaseOrder')
+    
+    def __unicode__(self):
+        return 'Item: ' + self.itemvendor.companyitem.name + ' Rating: ' +str(self.rating)
+
+    
+     

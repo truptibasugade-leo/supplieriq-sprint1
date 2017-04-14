@@ -19,7 +19,8 @@ from django.core.validators import RegexValidator
 from django.core.paginator import Page
 from django.core.serializers.json import DjangoJSONEncoder
 import logging
-from supplieriq.models import CompanyVendor,Company, VendorAddress, CompanyItem,Price,FixedCost,VariableCost,ItemVendor
+from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price, \
+    FixedCost,VariableCost,ItemVendor,UserCompanyModel,PurchaseOrder,ItemReceipt
 
 logger = logging.getLogger('file_debug_log')
 
@@ -349,3 +350,28 @@ class VariableCostSerializer(serializers.Serializer):
                     error = "Price for this Quantity already exists."
                     raise serializers.ValidationError(error) 
         return attrs
+    
+
+class PurchaseOrderSerializer(serializers.Serializer):
+
+    """
+    Used for indexing only.
+    """
+    item = serializers.SerializerMethodField('get_item_object')
+    PO_date = serializers.DateTimeField(read_only=True)
+    recieve_by_date = serializers.DateTimeField(read_only=True)
+    quantity = serializers.CharField(read_only=True)
+    unit_price = serializers.CharField(read_only=True)
+    total_amount = serializers.CharField(read_only=True)
+    erp_po_code = serializers.CharField(read_only=True)
+    
+    class Meta(object):
+        model = PurchaseOrder
+        fields = (
+            'item','PO_date', 'recieve_by_date','quantity','unit_price','total_amount','erp_po_code'
+        )
+    
+    def get_item_object(self, obj):    
+        item = obj.itemvendor.companyitem   
+        return {"item_name":item.name, "PO_id": obj.id} 
+    

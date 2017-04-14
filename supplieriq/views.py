@@ -20,11 +20,14 @@ import time
 from django.utils.http import cookie_date
 from django.core.cache import cache
 from django.contrib.auth.models import Group
-from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer,ItemVendorSerializer,CostSerializer,FixedCostSerializer,VariableCostSerializer
+from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer, \
+    ItemVendorSerializer,CostSerializer,FixedCostSerializer,VariableCostSerializer, \
+    PurchaseOrderSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
-from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price,FixedCost,VariableCost,ItemVendor,UserCompanyModel
+from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price, \
+    FixedCost,VariableCost,ItemVendor,UserCompanyModel,PurchaseOrder,ItemReceipt
 from django.shortcuts import render_to_response
 import uuid 
 from django.conf import settings
@@ -155,7 +158,6 @@ class ItemsAPI(APIView):
             item_id = request.query_params['id']
             obj = CompanyItem.objects.get(id=item_id)            
             serializer = ItemSerializer(obj)  
-            print serializer.data                        
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
             try:
@@ -337,4 +339,26 @@ class QuoteAPI(APIView):
             serializer = CostSerializer(obj)
             return Response({'serializer':serializer.data,'vendor_id':obj.companyvendor_id,'item_id':obj.companyitem_id},template_name="update_cost.html")
 
+class PurchaseOrderAPI(APIView):
+    """
+    This API is used to render template having Purchase Order list or 
+    if query parameter like 'id' is sent the it will render Purchase Order details
+    """
     
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    def get(self, request,*args, **kwargs):
+        try:            
+            po_id = request.query_params['id']
+            obj = PurchaseOrder.objects.get(id=po_id)            
+            serializer = PurchaseOrderSerializer(obj)                                
+            return Response({'serializer':serializer.data},template_name="purchase_order/purchase_order_details.html")
+        except:
+            try:
+                objs = UserCompanyModel.objects.filter(user=request.user).first()
+                item_queryset = CompanyItem.objects.filter(company_id = objs.company_id)
+                queryset = PurchaseOrder.objects.filter(itemvendor__companyitem__in =item_queryset)
+            except:
+                queryset = PurchaseOrder.objects.all()
+            serializer = PurchaseOrderSerializer(queryset, many=True)     
+            return Response({'serializer':serializer.data},template_name="purchase_order/purchase_order_list.html")
+        

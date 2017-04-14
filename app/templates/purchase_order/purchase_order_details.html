@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% load generic_tags %}
+{% block content%}
+
+<div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
+	<div class="container">
+		<div class="row">
+			<h3><strong>Purchase Order</strong></h3>
+			{{serializer}}
+			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
+				{% for key, value in serializer.items%}
+					{% if key == 'name' %}
+						<span><h4>{{value}}</h4></span><br/>
+					{% endif %}
+				{% endfor %}	
+				<div class="vendorLabel"><b>Primary Information</b></div>			
+				<div class="vendorInfo row">
+					{% for key, value in serializer.items%}
+						{% if key == 'item' or key == 'recieve_by_date' or key == 'vendor'%}
+						
+						<div class="col-sm-6">							
+							<label>
+								{% if key == 'item' %}
+									{% for ii, jj in value.items %}
+										{% if ii == 'PO_id'%}
+											{% format_label ii %}
+										{% endif %} 
+								   	{% endfor %}
+								   {% else %}
+								   		{% format_label key%}
+								   {% endif %}
+						  </label><br/>
+							<span class="vendorDetail">
+								{% if key == 'item' %}
+									{% for ii, jj in value.items %}
+										{% if ii == 'PO_id'%}
+											# {{ jj }}
+										{% endif %} 
+								   	{% endfor %}
+								   {% else %}
+								   		{{value}}
+								   {% endif %}
+								
+							</span><br/>
+						</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+				<div class="vendorLabel"><b>Email | Phone | Address </b></div>
+				<div class="vendorInfo row">
+					{% for key, value in serializer.items%}
+						{% if key == 'email' or key == 'phone' or key == 'address'%}
+							{% if key == 'address' %}
+							<div class="col-sm-6">
+								<label>{% format_label key%}  </label><br/>
+								<span class="vendorDetail">{{value|linebreaksbr}}</span><br/>
+							</div>
+							{% else %}
+							<div class="col-sm-6">
+								<label>{% format_label key%}  </label><br/>
+								<span class="vendorDetail">{{value}}</span><br/>
+							</div>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	 </div>
+</div> 
+{% endblock %}
+
