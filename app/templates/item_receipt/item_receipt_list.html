@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% load generic_tags %}
+{% block content%}
+<script type="text/javascript">
+$(document).ready(function() {
+	var table = $('#example').DataTable();
+	table.column( 0 ).visible( false );
+	table.column( 3 ).visible( false );
+	table.column( 4 ).visible( false );
+	table.column( 5 ).visible( false ); 
+} );
+</script>
+<div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12 col-lg-12"> 
+				<h4><strong>Item Receipts</strong></h4>
+				 <table class="table table-striped table-bordered custom_datatable" id="example" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th>Vendor</th>
+							<th>Item</th>
+							<th>Date</th>
+							<th>Rating</th>	
+							<th>Created From</th>
+							<th>Location </th>
+							<th>Item Receipt No.</th>													
+						</tr>
+					</thead>
+					<tbody>
+						{% for data in serializer %}
+						<tr class="gradeA odd" >							
+							{% for key, value in data.items %}		
+								{% if key == 'item' %}												
+								<td><a href="javascript:void(0);" class="ir_item" data-ir-id="{{data.item_receipt}}">#{{value.item_name}}</a></td>		
+								{% else %}
+									{% if key == 'date' %}
+										<td>{% convert_to_date value %}
+									{% else %}
+										<td>{{value}}</td>
+									{% endif %}									
+								{% endif %}
+							{% endfor %} 
+						</tr>
+						{% endfor %} 
+					</tbody>
+				</table>
+				</div>
+			</div>
+		 </div>
+	</div> 
+</div>
+{% endblock %}
+
