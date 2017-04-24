@@ -48,7 +48,7 @@ class CompanyVendor(models.Model):
     link_expiration_date = models.DateTimeField(default=datetime.now)
     
     def __unicode__(self):
-        return self.name
+        return "Company : "+self.company.name+", Vendor : "+self.name
     
 class CompanyItem(models.Model):
 
@@ -63,7 +63,7 @@ class CompanyItem(models.Model):
     target_price = models.DecimalField(max_digits=10, decimal_places=2,default=Decimal('0.00'))
     vendor = models.ManyToManyField('CompanyVendor')
     def __unicode__(self):
-        return self.name
+        return "Company : "+self.company.name+", Item : " +self.name
  
 class VendorAddress(models.Model):
     """
@@ -101,7 +101,7 @@ class VendorAddress(models.Model):
         return ', '.join(address_list)
  
     def __unicode__(self):
-        return self.get_address()
+        return "Vendor : " +self.vendor.name +' - '+ self.get_address()
 
 
 class ItemVendor(models.Model):
@@ -109,7 +109,7 @@ class ItemVendor(models.Model):
     companyvendor = models.ForeignKey('CompanyVendor') 
     
     def __unicode__(self):
-        return 'Item: ' + self.companyitem.name + ' Vendor: ' +self.companyvendor.name
+        return 'Item : ' + self.companyitem.name + ' Vendor : ' +self.companyvendor.name 
 
     class Meta:
         managed = False
@@ -121,7 +121,8 @@ class FixedCost(models.Model):
     cost_type = models.CharField(max_length=256, null=True, blank=True)
     cost = models.CharField(max_length=256, null=True, blank=True)
     def __unicode__(self):
-        return self.cost_type
+        return "ItemVendor : " + str(self.itemvendor.companyitem.name)+ \
+            ' ' + str(self.itemvendor.companyvendor.name) +', Cost Type : ' +str(self.cost_type)
 
     
 class VariableCost(models.Model):
@@ -129,7 +130,8 @@ class VariableCost(models.Model):
     quantity = models.CharField(max_length=256, null=True, blank=True)
     cost = models.CharField(max_length=256, null=True, blank=True)
     def __unicode__(self):
-        return 'Quantity: ' +self.quantity + ', Cost:'+self.cost
+        return "ItemVendor : " + str(self.itemvendor.companyitem.name)+ \
+            ' ' + str(self.itemvendor.companyvendor.name) +', Quantity : ' +self.quantity + ', Cost : '+self.cost
 
 
 class Price(models.Model):    
@@ -151,7 +153,7 @@ class UserCompanyModel(models.Model):
         unique_together = ("user","company")
 
     def __unicode__(self):
-        return str(self.id)
+        return 'User : ' + str(self.user.username) + ', Company : ' + str(self.company.name)
     
 class Location(models.Model):
     """
@@ -190,7 +192,7 @@ class Location(models.Model):
         address_list = [self.address1, self.address2, self.city, self.state,
                         self.country, self.zipcode]
         address_list = filter(None, address_list)
-        return ', '.join(address_list)
+        return "Company : " + self.company.name + ", Address : " + ', '.join(address_list)
  
     def __unicode__(self):
         return self.get_address()
@@ -212,7 +214,7 @@ class PurchaseOrder(models.Model):
     erp_po_code = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
-        return 'PO Date: ' + str(self.PO_date.date()) +' Item: ' + self.itemvendor.companyitem.name + ' Vendor: ' +self.itemvendor.companyvendor.name
+        return 'PO Date : ' + str(self.PO_date.date()) +', Item : ' + self.itemvendor.companyitem.name + ', Vendor : ' +self.itemvendor.companyvendor.name
 
      
 class ItemReceipt(models.Model):
@@ -228,7 +230,7 @@ class ItemReceipt(models.Model):
     created_from = models.ForeignKey('PurchaseOrder')
     
     def __unicode__(self):
-        return 'Item: ' + self.itemvendor.companyitem.name + ' Rating: ' +str(self.rating)
+        return 'Item : ' + self.itemvendor.companyitem.name + ', Rating : ' +str(self.rating)
 
     
      

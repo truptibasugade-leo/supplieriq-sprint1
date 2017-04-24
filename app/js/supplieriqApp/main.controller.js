@@ -18,6 +18,12 @@ app.controller("VendorController",['$scope', '$http','$compile','$rootScope',
 		window.location.replace('/purchase_order/?id='+po_id);	
 		
 	});
+	$(".ir_item").click(function() {
+		
+		var ir_id = $(this).data('ir-id');	
+		window.location.replace('/item_receipt/?id='+ir_id);	
+		
+	});
 	$('.price').click(function(){
 		var data = $(this).data('id');
 		var item_id = $(this).data('item-id');

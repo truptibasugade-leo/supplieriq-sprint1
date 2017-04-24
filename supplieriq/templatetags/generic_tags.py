@@ -4,6 +4,7 @@ from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 # from django.utils import simplejson
 import json
+import datetime
 
 def jsonify(object):
     if isinstance(object, QuerySet):
@@ -19,3 +20,8 @@ def get_json(data):
 @register.simple_tag
 def format_label(data):
     return data.title()
+
+@register.simple_tag
+def convert_to_date(data):
+    v = datetime.datetime.strptime(data, '%Y-%m-%dT%H:%M:%SZ')
+    return v.date()

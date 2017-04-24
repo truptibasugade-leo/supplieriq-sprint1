@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.db import models
-from supplieriq.models import CompanyVendor,Company,Account,CompanyItem, VendorAddress,FixedCost,VariableCost,UserCompanyModel,Location,PurchaseOrder,ItemReceipt
+from supplieriq.models import CompanyVendor,Company,Account,CompanyItem,\
+     VendorAddress,FixedCost,VariableCost,UserCompanyModel,Location,PurchaseOrder,ItemReceipt,\
+     ItemVendor
 # Register your models here.
 class CompanyAdmin(admin.ModelAdmin):    
     fields = ('name', )
@@ -41,6 +43,9 @@ class PurchaseOrderAdmin(admin.ModelAdmin):
 class ItemReceiptAdmin(admin.ModelAdmin):
     fields = ('itemvendor','date','rating','to_location','created_from')
 
+class ItemVendorAdmin(admin.ModelAdmin):
+    fields = ('companyitem','companyvendor')
+
 admin.site.register(CompanyVendor, CompanyVendorAdmin)
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Account, AccountAdmin)
@@ -52,6 +57,7 @@ admin.site.register(UserCompanyModel, UserCompanyAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ItemReceipt, ItemReceiptAdmin)
 admin.site.register(PurchaseOrder, PurchaseOrderAdmin)
+admin.site.register(ItemVendor, ItemVendorAdmin)
 
 
 

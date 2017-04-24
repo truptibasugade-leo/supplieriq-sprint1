@@ -2,12 +2,16 @@
 {% load static %}
 {% load generic_tags %}
 {% block content%}
-
+<script type="text/javascript">
+$(document).ready(function() {
+	 $('#example1').DataTable();	
+});
+</script>
 <div class="siq_company_heading siq_welcome siq_dashboard_heading"  ng-controller="VendorController">
 	<div class="container">
 		<div class="row">
 			<h3><strong>Purchase Order</strong></h3>
-			{{serializer}}
+			
 			<div class="siq_left_info_box  col-sm-12 col-lg-12"> 
 				{% for key, value in serializer.items%}
 					{% if key == 'name' %}
@@ -17,53 +21,58 @@
 				<div class="vendorLabel"><b>Primary Information</b></div>			
 				<div class="vendorInfo row">
 					{% for key, value in serializer.items%}
-						{% if key == 'item' or key == 'recieve_by_date' or key == 'vendor'%}
+						{% if key == 'po_id' or key == 'recieve_by_date' or key == 'vendor'%}
 						
 						<div class="col-sm-6">							
 							<label>
-								{% if key == 'item' %}
-									{% for ii, jj in value.items %}
-										{% if ii == 'PO_id'%}
-											{% format_label ii %}
-										{% endif %} 
-								   	{% endfor %}
-								   {% else %}
-								   		{% format_label key%}
-								   {% endif %}
+							   		{% format_label key%}
 						  </label><br/>
 							<span class="vendorDetail">
-								{% if key == 'item' %}
-									{% for ii, jj in value.items %}
-										{% if ii == 'PO_id'%}
-											# {{ jj }}
-										{% endif %} 
-								   	{% endfor %}
-								   {% else %}
-								   		{{value}}
-								   {% endif %}
+								{% if key == 'po_id' %}
+									#PO {{ value }}
+							    {% else %}
+							   		{% if key == 'recieve_by_date' %}
+							   			{% convert_to_date value %}
+							   		{% else %}
+							   			<a href="/vendors/?id={{value.vendor_id}}">{{value.vendor_name}}</a>
+							   		{% endif %}
+							   {% endif %}
 								
 							</span><br/>
 						</div>
+						{% elif key == 'total_amount' %}
+							<div class="col-sm-6" style="border: 2px solid #CCBA7C;padding: 0px;border-radius:3px">
+								<label class="vendorLabel" style="width: 100%;border-radius:0px">Summary</label><br/>
+								<span class="vendorDetail" style="padding: 2px 15px;">
+									<b>TOTAL = </b><span> {{value}}</span>							   	
+								</span><br/>
+							</div>
 						{% endif %}
 					{% endfor %}
 				</div>
-				<div class="vendorLabel"><b>Email | Phone | Address </b></div>
+				
+				<div class="vendorLabel"><b>Item Details </b></div>
 				<div class="vendorInfo row">
-					{% for key, value in serializer.items%}
-						{% if key == 'email' or key == 'phone' or key == 'address'%}
-							{% if key == 'address' %}
-							<div class="col-sm-6">
-								<label>{% format_label key%}  </label><br/>
-								<span class="vendorDetail">{{value|linebreaksbr}}</span><br/>
-							</div>
-							{% else %}
-							<div class="col-sm-6">
-								<label>{% format_label key%}  </label><br/>
-								<span class="vendorDetail">{{value}}</span><br/>
-							</div>
-							{% endif %}
-						{% endif %}
-					{% endfor %}
+					<table class="table table-striped table-bordered custom_datatable" id="example1" cellspacing="0" width="100%">
+					<thead>
+						<tr>							
+							<th>Item</th>
+							<th>Vendor Name</th>
+							<th>Quantity </th>
+							<th>Rate</th>
+							<th>Amount</th>			
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="gradeA odd" >	
+							<td><a href="/items/?id={{serializer.item.item_id}}">{{serializer.item.item_name}}</a></td>
+							<td>{{serializer.vendor.vendor_name}}</td>
+							<td>{{serializer.quantity}}</td>
+							<td>{{serializer.unit_price}}</td>
+							<td>{{serializer.total_amount}}</td>
+						</tr>
+					</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

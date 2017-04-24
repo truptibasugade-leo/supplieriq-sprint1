@@ -21,4 +21,6 @@ urlpatterns = [
         name='quote'),
     url(r'^purchase_order', views.PurchaseOrderAPI.as_view(),
         name='purchase_order'),
+    url(r'^item_receipt', views.ItemReceiptAPI.as_view(),
+        name='item_receipt'),
 ]

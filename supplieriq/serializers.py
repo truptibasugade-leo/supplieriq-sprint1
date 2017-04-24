@@ -357,13 +357,18 @@ class PurchaseOrderSerializer(serializers.Serializer):
     """
     Used for indexing only.
     """
+    po_id = serializers.SerializerMethodField('get_po_object')
     item = serializers.SerializerMethodField('get_item_object')
     PO_date = serializers.DateTimeField(read_only=True)
     recieve_by_date = serializers.DateTimeField(read_only=True)
     quantity = serializers.CharField(read_only=True)
     unit_price = serializers.CharField(read_only=True)
-    total_amount = serializers.CharField(read_only=True)
+    vendor = serializers.SerializerMethodField('get_vendor_object')
     erp_po_code = serializers.CharField(read_only=True)
+    total_amount = serializers.CharField(read_only=True)
+    
+    
+    
     
     class Meta(object):
         model = PurchaseOrder
@@ -372,6 +377,46 @@ class PurchaseOrderSerializer(serializers.Serializer):
         )
     
     def get_item_object(self, obj):    
-        item = obj.itemvendor.companyitem   
-        return {"item_name":item.name, "PO_id": obj.id} 
+        item = obj.itemvendor.companyitem  
+        return {"item_name":item.name,"item_id":item.id} 
+    
+    def get_vendor_object(self, obj):    
+        vendor =  obj.itemvendor.companyvendor
+        return {"vendor_name":vendor.name, "vendor_id": vendor.id } 
+    
+    def get_po_object(self, obj):    
+        return obj.id 
+    
+class ItemReceiptSerializer(serializers.Serializer):
+
+    """
+    Used for indexing only.
+    """
+    vendor = serializers.SerializerMethodField('get_vendor_object')
+    item = serializers.SerializerMethodField('get_item_object')
+    date = serializers.DateTimeField(read_only=True)
+    rating = serializers.CharField(read_only=True)
+    created_from = serializers.SerializerMethodField('get_po_object')
+    to_location = serializers.CharField(read_only=True)    
+    item_receipt = serializers.SerializerMethodField('get_ir_object')
+    
+    class Meta(object):
+        model = PurchaseOrder  
+        fields = (
+            'item','date', 'rating','quantity','created_from','to_location'
+        )
+    
+    def get_item_object(self, obj):    
+        item = obj.itemvendor.companyitem  
+        return {"item_name":item.name,"item_id":item.id,'quantity':obj.created_from.quantity,'unit_price':obj.created_from.unit_price} 
+    
+    def get_vendor_object(self, obj):    
+        vendor =  obj.itemvendor.companyvendor
+        return {"vendor_name":vendor.name, "vendor_id": vendor.id } 
+    
+    def get_po_object(self, obj):    
+        return obj.created_from.id 
+    
+    def get_ir_object(self, obj):    
+        return obj.id 
     

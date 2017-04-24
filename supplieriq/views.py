@@ -22,7 +22,7 @@ from django.core.cache import cache
 from django.contrib.auth.models import Group
 from supplieriq.serializers import SignInSerializer,VendorSerializer,ItemSerializer, \
     ItemVendorSerializer,CostSerializer,FixedCostSerializer,VariableCostSerializer, \
-    PurchaseOrderSerializer
+    PurchaseOrderSerializer,ItemReceiptSerializer
 from django.contrib.auth.models import User
 from django.contrib import auth
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -361,4 +361,26 @@ class PurchaseOrderAPI(APIView):
                 queryset = PurchaseOrder.objects.all()
             serializer = PurchaseOrderSerializer(queryset, many=True)     
             return Response({'serializer':serializer.data},template_name="purchase_order/purchase_order_list.html")
+        
+class ItemReceiptAPI(APIView):
+    """
+    This API is used to render template having Item Receipt list or 
+    if query parameter like 'id' is sent the it will render Item Receipt details
+    """
+    renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
+    def get(self, request,*args, **kwargs):
+        try:            
+            po_id = request.query_params['id']
+            obj = ItemReceipt.objects.get(id=po_id)            
+            serializer = ItemReceiptSerializer(obj)                                
+            return Response({'serializer':serializer.data},template_name="item_receipt/item_receipt_details.html")
+        except:
+            try:
+                objs = UserCompanyModel.objects.filter(user=request.user).first()
+                item_queryset = CompanyItem.objects.filter(company_id = objs.company_id)
+                queryset = ItemReceipt.objects.filter(itemvendor__companyitem__in =item_queryset)
+            except:
+                queryset = ItemReceipt.objects.all()
+            serializer = ItemReceiptSerializer(queryset, many=True)     
+            return Response({'serializer':serializer.data},template_name="item_receipt/item_receipt_list.html")
         

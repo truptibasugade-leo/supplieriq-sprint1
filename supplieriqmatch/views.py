@@ -26,9 +26,15 @@ class MatchAPI(APIView):
             lat1,long1 = get_lat_long(loc)    
             obj = ItemVendor.objects.filter(companyitem_id = item_id)
             qq = []
-            for item in obj:                
-                f_c = item.fixedcost_set.all()
-                v_c = item.variablecost_set.all()
+            for item in obj:   
+                try:             
+                    f_c = item.fixedcost_set.all()
+                except:
+                    f_c = ''
+                try:
+                    v_c = item.variablecost_set.all()
+                except:
+                    v_c= ''
                 fixed_cost = 0
                 variable_cost = 0
                 if f_c:
