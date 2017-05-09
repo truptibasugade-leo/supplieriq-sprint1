@@ -26,6 +26,7 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^', include('supplieriq.urls')),
     url(r'^match/', include('supplieriqmatch.urls')),
+    url(r'^api/', include('supplieriqApi.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 urlpatterns += router.urls

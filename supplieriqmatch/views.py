@@ -53,7 +53,7 @@ class MatchAPI(APIView):
                         v_addr = item.companyvendor.vendoraddress_set.first()
                         lat2,long2 = get_lat_long(v_addr)                        
                         if lat1 and long1 and lat2 and long2:
-                            dist = distance(lat1,long1, lat2, long2)
+                            dist = distance(lat1,long1,lat2,long2)
                         else:
                             if lat1=='' or long1=='':
                                 dist = 'Incorrect Company Address..!!'
