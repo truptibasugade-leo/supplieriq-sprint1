@@ -70,6 +70,14 @@ class VendorApiSerializer(serializers.ModelSerializer):
             'name', 'erp_vendor_code','phone', 'email','address_set',
         )
 
+class ItemVendorApiSerializer(serializers.ModelSerializer):
+    
+    class Meta(object):
+        model = CompanyItem
+        fields = (
+            'name', 'description','target_price', 'erp_item_code',
+        )
+    
 class ItemApiSerializer(serializers.ModelSerializer):
 
     """
@@ -80,10 +88,20 @@ class ItemApiSerializer(serializers.ModelSerializer):
     target_price = serializers.CharField(required=True)
     erp_item_code = serializers.CharField(required=True)           
 
+    def create(self, validated_data,request):     
+        
+        ob = UserCompanyModel.objects.get(user=request.user)
+        validated_data.update({"company":ob.company})
+        obj = CompanyItem.objects.create(**validated_data)        
+        return obj        
+        
+        return ''
+    
     class Meta(object):
-        model = CompanyVendor
+        model = CompanyItem
         fields = (
             'name', 'description','target_price', 'erp_item_code',
         )
-
+    
+    
      

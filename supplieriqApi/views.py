@@ -11,7 +11,7 @@ from supplieriqApi.utils import AuthenticatedUserMixin
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer
+from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer
 # Create your views here.
 
 class VendorsAPI(AuthenticatedUserMixin,APIView):
@@ -66,9 +66,24 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
                 queryset = CompanyItem.objects.filter(company_id = objs.company_id)
             except:
-                queryset = CompanyItem.objects.all()           
+                queryset = CompanyItem.objects.all()            
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
             serializer = ItemSerializer(queryset, many=True)         
             return Response(serializer.data)
     
+    def post(self,request,*args, **kwargs):
+        serializer = ItemApiSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.data
+            obj = serializer.create(serializer.validated_data,request)
+            xx = ItemVendorApiSerializer(data= request.data['vendor'])
+            item_vendor = xx.create(request.data['vendor'],obj)
+            print data
+            return Response(data)
+        else:
+            print serializer.errors
+            return Response(serializer.errors)
+
+class SignInOutApi(APIView):
+    pass
     
