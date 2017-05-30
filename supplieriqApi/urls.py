@@ -8,4 +8,6 @@ urlpatterns = [
         name='vendor'),
     url(r'^item', views.ItemsAPI.as_view(),
         name='item'),
+    url(r'^runmatch', views.RunMatchAPI.as_view(),
+        name='runmatch'),
 ]
