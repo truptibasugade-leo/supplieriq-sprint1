@@ -355,8 +355,7 @@ class PurchaseOrderAPI(APIView):
         except:
             try:
                 objs = UserCompanyModel.objects.filter(user=request.user).first()
-                item_queryset = CompanyItem.objects.filter(company_id = objs.company_id)
-                queryset = PurchaseOrder.objects.filter(itemvendor__companyitem__in =item_queryset)
+                queryset = PurchaseOrder.objects.filter(company=objs.company)
             except:
                 queryset = PurchaseOrder.objects.all()
             serializer = PurchaseOrderSerializer(queryset, many=True)     

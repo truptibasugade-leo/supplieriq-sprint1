@@ -358,30 +358,38 @@ class PurchaseOrderSerializer(serializers.Serializer):
     Used for indexing only.
     """
     po_id = serializers.SerializerMethodField('get_po_object')
-    item = serializers.SerializerMethodField('get_item_object')
     PO_date = serializers.DateTimeField(read_only=True)
     recieve_by_date = serializers.DateTimeField(read_only=True)
-    quantity = serializers.CharField(read_only=True)
-    unit_price = serializers.CharField(read_only=True)
     vendor = serializers.SerializerMethodField('get_vendor_object')
     erp_po_code = serializers.CharField(read_only=True)
-    total_amount = serializers.CharField(read_only=True)
-    
+    total = serializers.CharField(read_only=True)
+    poitem = serializers.SerializerMethodField('get_poitem_object')
     
     
     
     class Meta(object):
         model = PurchaseOrder
         fields = (
-            'item','PO_date', 'recieve_by_date','quantity','unit_price','total_amount','erp_po_code'
+            'PO_date', 'recieve_by_date','total_amount','erp_po_code','total'
         )
     
-    def get_item_object(self, obj):    
-        item = obj.itemvendor.companyitem  
-        return {"item_name":item.name,"item_id":item.id} 
+    def get_poitem_object(self, obj): 
+        items = obj.poitem_set.all()  
+        
+        y =[]
+        for x in items:
+            q={}
+            q['item_name'] =  x.item.name
+            q['item_id'] = x.item.id
+            q['quantity'] = x.quantity
+            q['unit_price'] = x.unit_price
+            q['total_amount'] = x.total_amount
+            y.append(q)
+        print y
+        return y 
     
     def get_vendor_object(self, obj):    
-        vendor =  obj.itemvendor.companyvendor
+        vendor =  obj.vendor
         return {"vendor_name":vendor.name, "vendor_id": vendor.id } 
     
     def get_po_object(self, obj):    
@@ -407,11 +415,22 @@ class ItemReceiptSerializer(serializers.Serializer):
         )
     
     def get_item_object(self, obj):    
-        item = obj.itemvendor.companyitem  
-        return {"item_name":item.name,"item_id":item.id,'quantity':obj.created_from.quantity,'unit_price':obj.created_from.unit_price} 
+        items = obj.created_from.poitem_set.all() 
+        y =[]
+        for x in items:
+            q={}
+            q['item_name'] =  x.item.name
+            q['item_id'] = x.item.id
+            q['quantity'] = x.quantity
+            q['unit_price'] = x.unit_price
+           
+            y.append(q)
+        print y
+        
+        return y 
     
     def get_vendor_object(self, obj):    
-        vendor =  obj.itemvendor.companyvendor
+        vendor =  obj.created_from.vendor
         return {"vendor_name":vendor.name, "vendor_id": vendor.id } 
     
     def get_po_object(self, obj):    

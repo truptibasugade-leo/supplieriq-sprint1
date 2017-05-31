@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from supplieriq.models import CompanyVendor,Company,Account,CompanyItem,\
      VendorAddress,FixedCost,VariableCost,UserCompanyModel,Location,PurchaseOrder,ItemReceipt,\
-     ItemVendor
+     ItemVendor,POItem
 # Register your models here.
 class CompanyAdmin(admin.ModelAdmin):    
     fields = ('name', )
@@ -38,10 +38,14 @@ class LocationAdmin(admin.ModelAdmin):
     fields = ('address1','address2','company','city','state','country','zipcode','latitude','longitude','phone')
 
 class PurchaseOrderAdmin(admin.ModelAdmin):
-    fields = ('itemvendor','PO_date','recieve_by_date','quantity','unit_price','total_amount','erp_po_code')
+    fields = ('vendor','company','PO_date','recieve_by_date','total','erp_po_code')
 
 class ItemReceiptAdmin(admin.ModelAdmin):
-    fields = ('itemvendor','date','rating','to_location','created_from')
+    fields = ('date','rating','to_location','created_from')
+
+class POItemAdmin(admin.ModelAdmin):
+    fields = ('purchaseorder','item','quantity','unit_price','total_amount')
+
 
 class ItemVendorAdmin(admin.ModelAdmin):
     fields = ('companyitem','companyvendor')
@@ -57,6 +61,7 @@ admin.site.register(UserCompanyModel, UserCompanyAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ItemReceipt, ItemReceiptAdmin)
 admin.site.register(PurchaseOrder, PurchaseOrderAdmin)
+admin.site.register(POItem, POItemAdmin)
 admin.site.register(ItemVendor, ItemVendorAdmin)
 
 

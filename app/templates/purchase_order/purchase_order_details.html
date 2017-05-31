@@ -40,7 +40,7 @@ $(document).ready(function() {
 								
 							</span><br/>
 						</div>
-						{% elif key == 'total_amount' %}
+						{% elif key == 'total' %}
 							<div class="col-sm-6" style="border: 2px solid #CCBA7C;padding: 0px;border-radius:3px">
 								<label class="vendorLabel" style="width: 100%;border-radius:0px">Summary</label><br/>
 								<span class="vendorDetail" style="padding: 2px 15px;">
@@ -50,7 +50,6 @@ $(document).ready(function() {
 						{% endif %}
 					{% endfor %}
 				</div>
-				
 				<div class="vendorLabel"><b>Item Details </b></div>
 				<div class="vendorInfo row">
 					<table class="table table-striped table-bordered custom_datatable" id="example1" cellspacing="0" width="100%">
@@ -64,13 +63,15 @@ $(document).ready(function() {
 						</tr>
 					</thead>
 					<tbody>
+						{% for x in serializer.poitem %}
 						<tr class="gradeA odd" >	
-							<td><a href="/items/?id={{serializer.item.item_id}}">{{serializer.item.item_name}}</a></td>
+							<td><a href="/items/?id={{x.item_id}}">{{x.item_name}}</a></td>
 							<td>{{serializer.vendor.vendor_name}}</td>
-							<td>{{serializer.quantity}}</td>
-							<td>{{serializer.unit_price}}</td>
-							<td>{{serializer.total_amount}}</td>
+							<td>{{x.quantity}}</td>
+							<td>{{x.unit_price}}</td>
+							<td>{{x.total_amount}}</td>
 						</tr>
+						{% endfor %}
 					</tbody>
 					</table>
 				</div>

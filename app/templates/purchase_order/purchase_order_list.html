@@ -5,10 +5,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	var table = $('#example').DataTable();
-	table.column( 0 ).visible( false );
-	table.column( 2 ).visible( false );
-	table.column( 4 ).visible( false );
-	table.column( 5 ).visible( false );
+	table.column( 3 ).visible( false );
+	
 	table.column( 6 ).visible( false );
 } );
 </script>
@@ -20,15 +18,13 @@ $(document).ready(function() {
 				 <table class="table table-striped table-bordered custom_datatable" id="example" cellspacing="0" width="100%">
 					<thead>
 						<tr>
-							<th>PO id</th>
 							<th>PO#</th>
 							<th>PO Date</th>
 							<th>Receive By Date</th>
-							<th>Quantity</th>
-							<th>Price per Unit</th>
 							<th>Vendor</th>
 							<th>ERP Id</th>
 							<th>Total</th>
+							<th>PoItem</th>
 														
 						</tr>
 					</thead>
@@ -36,8 +32,8 @@ $(document).ready(function() {
 						{% for data in serializer %}
 						<tr class="gradeA odd" >							
 							{% for key, value in data.items %}		
-								{% if key == 'item' %}												
-								<td><a href="javascript:void(0);" class="po_item" data-po-id="{{data.po_id}}">#PO{{data.po_id}} - {{value.item_name}}</a></td>		
+								{% if key == 'po_id' %}												
+								<td><a href="javascript:void(0);" class="po_item" data-po-id="{{data.po_id}}">#PO{{data.po_id}}</a></td>		
 								{% else %}
 									{% if key == 'PO_date' or key == 'recieve_by_date' %}
 										<td>{% convert_to_date value %}

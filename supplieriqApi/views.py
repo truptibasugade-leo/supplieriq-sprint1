@@ -138,7 +138,7 @@ class RunMatchAPI(AuthenticatedUserMixin,APIView):
                         zz = serializer.data                    
                         zz.update({"total price":float(total)})
 #                         zz.update({"distance":dist})
-                        
+
                         # find quality
 #                         quality = calculate_quality(item)
 

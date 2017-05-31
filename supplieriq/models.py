@@ -199,27 +199,38 @@ class Location(models.Model):
 
 class PurchaseOrder(models.Model):
      
-    itemvendor = models.ForeignKey('ItemVendor')
+    vendor = models.ForeignKey('CompanyVendor', null=True, blank=True)
   
     PO_date = models.DateTimeField(default=datetime.now)
      
     recieve_by_date = models.DateTimeField(default=datetime.now)
+    
+    total = models.DecimalField(max_digits=10, decimal_places=2,default=Decimal('0.00'))
+    
+    company = models.ForeignKey('Company', null=True, blank=True)
   
+    erp_po_code = models.CharField(max_length=255, null=True, blank=True)
+    
+    def __unicode__(self):
+        return 'PO Date : ' + str(self.PO_date.date()) + ', Recieve By Date : ' + str(self.recieve_by_date.date())
+    
+class POItem(models.Model):
+    
+    purchaseorder = models.ForeignKey(PurchaseOrder,null=True, blank=True)
+    
+    item = models.ForeignKey('CompanyItem')
+    
     quantity = models.CharField(max_length=255, null=True, blank=True)
     
     unit_price = models.CharField(max_length=255, null=True, blank=True)
     
     total_amount = models.CharField(max_length=255, null=True, blank=True)
     
-    erp_po_code = models.CharField(max_length=255, null=True, blank=True)
-    
     def __unicode__(self):
-        return 'PO Date : ' + str(self.PO_date.date()) +', Item : ' + self.itemvendor.companyitem.name + ', Vendor : ' +self.itemvendor.companyvendor.name
+        return 'PO : '+str(self.purchaseorder.id)+', Item : ' + self.item.name 
 
      
 class ItemReceipt(models.Model):
-     
-    itemvendor = models.ForeignKey('ItemVendor')
      
     date = models.DateTimeField(default=datetime.now)
   
@@ -230,7 +241,7 @@ class ItemReceipt(models.Model):
     created_from = models.ForeignKey('PurchaseOrder')
     
     def __unicode__(self):
-        return 'Item : ' + self.itemvendor.companyitem.name + ', Rating : ' +str(self.rating)
+        return 'PO ID : ' + str(self.created_from.id) + ', Rating : ' +str(self.rating)
 
     
      
