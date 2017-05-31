@@ -376,8 +376,8 @@ class ItemReceiptAPI(APIView):
         except:
             try:
                 objs = UserCompanyModel.objects.filter(user=request.user).first()
-                item_queryset = CompanyItem.objects.filter(company_id = objs.company_id)
-                queryset = ItemReceipt.objects.filter(itemvendor__companyitem__in =item_queryset)
+                po_queryset = PurchaseOrder.objects.filter(company_id = objs.company_id)
+                queryset = ItemReceipt.objects.filter(created_from__in =po_queryset)
             except:
                 queryset = ItemReceipt.objects.all()
             serializer = ItemReceiptSerializer(queryset, many=True)     
