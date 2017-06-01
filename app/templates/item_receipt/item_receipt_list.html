@@ -20,7 +20,7 @@ $(document).ready(function() {
 					<thead>
 						<tr>
 							<th>Vendor</th>
-							<th>Item</th>
+							<th>#Item Receipt - PO</th>
 							<th>Date</th>
 							<th>Rating</th>	
 							<th>Created From</th>
@@ -33,7 +33,7 @@ $(document).ready(function() {
 						<tr class="gradeA odd" >							
 							{% for key, value in data.items %}		
 								{% if key == 'item' %}												
-								<td><a href="javascript:void(0);" class="ir_item" data-ir-id="{{data.item_receipt}}">#{{data.item.0.item_name }}</a></td>		
+								<td><a href="javascript:void(0);" class="ir_item" data-ir-id="{{data.item_receipt}}">#{{data.item_receipt}} - {{ data.created_from }}</a></td>		
 								{% else %}
 									{% if key == 'date' %}
 										<td>{% convert_to_date value %}
