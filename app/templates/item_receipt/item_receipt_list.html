@@ -7,7 +7,7 @@ $(document).ready(function() {
 	var table = $('#example').DataTable();
 	table.column( 0 ).visible( false );
 	table.column( 3 ).visible( false );
-	table.column( 4 ).visible( false );
+	table.column( 6 ).visible( false );
 	table.column( 5 ).visible( false ); 
 } );
 </script>
@@ -20,25 +20,25 @@ $(document).ready(function() {
 					<thead>
 						<tr>
 							<th>Vendor</th>
-							<th>#Item Receipt - PO</th>
-							<th>Date</th>
+							<th>#Item Receipt</th>
+							<th>Purchase Order</th>
 							<th>Rating</th>	
-							<th>Created From</th>
+							<th>Date</th>
 							<th>Location</th>
 							<th>Item Receipt No.</th>													
 						</tr>
 					</thead>
-					<tbody>
+					<tbody>{{serializer}}
 						{% for data in serializer %}
 						<tr class="gradeA odd" >							
 							{% for key, value in data.items %}		
 								{% if key == 'item' %}												
-								<td><a href="javascript:void(0);" class="ir_item" data-ir-id="{{data.item_receipt}}">#{{data.item_receipt}} - #PO {{ data.created_from }}</a></td>		
+								<td><a href="javascript:void(0);" class="ir_item" data-ir-id="{{data.item_receipt}}">#{{data.item_receipt}}</a></td>		
 								{% else %}
 									{% if key == 'date' %}
 										<td>{% convert_to_date value %}
 									{% else %}
-										<td>{{value}}</td>
+										<td><a href="/purchase_order/?id={{value}}">#PO-{{value}}</a></td>
 									{% endif %}									
 								{% endif %}
 							{% endfor %} 

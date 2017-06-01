@@ -19,8 +19,12 @@ def get_json(data):
 
 @register.simple_tag
 def format_label(data):
-    return data.title()
-
+    vv= data.title()
+    if vv.find("_") != -1:
+        label = vv.replace("_"," ")
+    else:
+        label = vv
+    return label
 @register.simple_tag
 def convert_to_date(data):
     v = datetime.datetime.strptime(data, '%Y-%m-%dT%H:%M:%SZ')

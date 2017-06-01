@@ -385,7 +385,6 @@ class PurchaseOrderSerializer(serializers.Serializer):
             q['unit_price'] = x.unit_price
             q['total_amount'] = x.total_amount
             y.append(q)
-        print y
         return y 
     
     def get_vendor_object(self, obj):    
@@ -402,9 +401,9 @@ class ItemReceiptSerializer(serializers.Serializer):
     """
     vendor = serializers.SerializerMethodField('get_vendor_object')
     item = serializers.SerializerMethodField('get_item_object')
-    date = serializers.DateTimeField(read_only=True)
-    rating = serializers.CharField(read_only=True)
     created_from = serializers.SerializerMethodField('get_po_object')
+    rating = serializers.CharField(read_only=True)
+    date = serializers.DateTimeField(read_only=True)
     to_location = serializers.CharField(read_only=True)    
     item_receipt = serializers.SerializerMethodField('get_ir_object')
     
@@ -425,7 +424,6 @@ class ItemReceiptSerializer(serializers.Serializer):
             q['unit_price'] = x.unit_price
            
             y.append(q)
-        print y
         
         return y 
     
