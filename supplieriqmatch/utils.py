@@ -57,19 +57,26 @@ def calculate_fixed_cost(f_c):
 
 def calculate_quality(obj):
     try:
-        item_reciept_queryset =obj.itemreceipt_set.all()    
-        ratings= [x.rating for x in item_reciept_queryset]
-        print float(sum(ratings))
-        print len(ratings)
-        avg_rating = int(sum(ratings)) / len(ratings)
-        return avg_rating
+        tot=0
+        objs = 0
+        bb = obj.companyvendor.purchaseorder_set.all()   
+        for po in bb:
+            item_reciept_queryset =po.itemreceipt_set.all()
+            ratings= [x.rating for x in item_reciept_queryset]
+            print float(sum(ratings))
+            print len(ratings)
+            avg_rating = int(sum(ratings)) / len(ratings)
+            tot += avg_rating
+            objs += 1
+        total = tot/objs
+        return total
     except:
         return "No rating"
     
 def calculate_delay_time(item): 
-    
     try:
-        po_queryset = item.purchaseorder_set.all()
+        po_queryset = item.companyvendor.purchaseorder_set.all()   
+#         po_queryset = item.purchaseorder_set.all()
         avg_delay = 0
         for x in po_queryset:
             item_reciept_queryset = x.itemreceipt_set.all()
