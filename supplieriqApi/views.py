@@ -40,11 +40,12 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
     def post(self,request,*args, **kwargs):
         serializer = VendorApiSerializer(data=request.data)
         if serializer.is_valid():
+            import ipdb;ipdb.set_trace()
             data = serializer.data
             obj = serializer.create(serializer.validated_data,request)
             xx = VendorAddressSerializer(data= request.data['address_set'])
             addr_obj = xx.create(request.data['address_set'],obj)
-            print data
+            data.update({'vendorid':obj.id})
             return Response(data)
         else:
             print serializer.errors
