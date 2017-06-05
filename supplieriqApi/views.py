@@ -112,7 +112,6 @@ class SigninApi(APIView):
 
     @csrf_exempt
     def post(self, request, *args, **kwargs):
-        import ipdb;ipdb.set_trace()
         serializer = self.serializer_class(data=request.data)       
         if serializer.is_valid():
             user = serializer.instance            
