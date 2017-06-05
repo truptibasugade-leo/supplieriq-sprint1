@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import\
     get_user_model, authenticate, login as auth_login, logout as auth_logout
 from django.http import Http404
+from django.core import serializers
 # Create your views here.
 
 class VendorsAPI(AuthenticatedUserMixin,APIView):
@@ -61,15 +62,52 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
             print serializer.errors
             return Response(serializer.errors)
     
-    def put(self, request,pk):
-        import ipdb;ipdb.set_trace()
-        vendor_obj = self.get_object(pk)
-        serializer = VendorSerializer(vendor_obj, data=request.data)
-        if serializer.is_valid():
-#             serializer.save()
-            return Response(serializer.data)
-        return Response({"adh":"done"})
+    def validate_params(self,request,vendor_obj):
+        if request.has_key('phone'):
+            vendor_obj.phone = int(request['phone'])
+        if request.has_key('name'):
+            vendor_obj.name = request['name']
+        if request.has_key('email'):
+            vendor_obj.email = request['email']
+        if request.has_key('erp_vendor_code'):
+            vendor_obj.erp_vendor_code = int(request['erp_vendor_code'])
+        vendor_obj.save()
+        if request.has_key('address_set'):
+            if vendor_obj.vendoraddress_set.count() == 0:
+                try:
+                    xx = VendorAddressSerializer(data= request['address_set'])
+                    addr_obj = xx.create(request['address_set'],vendor_obj)
+                except:
+                    pass
+            else:
+                address = VendorAddress.objects.get(vendor_id=vendor_obj.id)
+                addr_set = request['address_set'][0]
+                if addr_set.has_key('address1'):
+                    address.address1 = addr_set['address1']
+                if addr_set.has_key('address2'):
+                    address.address2 = addr_set['address2']
+                if addr_set.has_key('city'):
+                    address.city = addr_set['city']
+                if addr_set.has_key('state'):
+                    address.state = addr_set['state']
+                if addr_set.has_key('country'):
+                    address.country = addr_set['country']
+                if addr_set.has_key('zipcode'):
+                    address.zipcode = addr_set['zipcode']
+                address.save()        
+        return True
     
+    def put(self, request,*args,**kwargs):
+        vendor_id = request.query_params['id']
+        vendor_obj = self.get_object(vendor_id)
+        if request.data:
+            obj = self.validate_params(request.data,vendor_obj)
+            if obj:
+                serializer = VendorSerializer(vendor_obj)
+                return Response({"result":serializer.data})
+
+        return Response({"result":"Invalid request"})
+        
 class ItemsAPI(AuthenticatedUserMixin,APIView):
     """
     This API is used to render template having Vendor list or 
