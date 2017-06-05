@@ -16,6 +16,7 @@ from supplieriqmatch.utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import\
     get_user_model, authenticate, login as auth_login, logout as auth_logout
+from django.http import Http404
 # Create your views here.
 
 class VendorsAPI(AuthenticatedUserMixin,APIView):
@@ -24,6 +25,13 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
     if query parameter like 'id' is sent the it will render Vendor details
     """
     renderer_classes = (renderers.JSONRenderer,)
+    
+    def get_object(self, pk):
+        try:
+            return CompanyVendor.objects.get(pk=pk)
+        except CompanyVendor.DoesNotExist:
+            raise Http404
+        
     def get(self, request,*args, **kwargs):
         try:
             vendor_id = request.query_params['id']
@@ -53,12 +61,13 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
             print serializer.errors
             return Response(serializer.errors)
     
-    def put(self, request,*args,**kwargs):
+    def put(self, request,pk):
         import ipdb;ipdb.set_trace()
-        vendor_id = request.query_params['id']
-        obj = CompanyVendor.objects.get(id=vendor_id)
-        serializer = VendorSerializer(obj)    
-
+        vendor_obj = self.get_object(pk)
+        serializer = VendorSerializer(vendor_obj, data=request.data)
+        if serializer.is_valid():
+#             serializer.save()
+            return Response(serializer.data)
         return Response({"adh":"done"})
     
 class ItemsAPI(AuthenticatedUserMixin,APIView):
@@ -103,13 +112,14 @@ class SigninApi(APIView):
 
     @csrf_exempt
     def post(self, request, *args, **kwargs):
+        import ipdb;ipdb.set_trace()
         serializer = self.serializer_class(data=request.data)       
         if serializer.is_valid():
             user = serializer.instance            
             token, created = Token.objects.get_or_create(user=user)  
-            new_user = authenticate(username=user.username, password=request.data.get('password'))
-            auth_login(request, new_user)
-            vv =request.user.usercompanymodel_set.first()
+#             new_user = authenticate(username=user.username, password=request.data.get('password'))
+#             auth_login(request, new_user)
+            vv =user.usercompanymodel_set.first()
             response = Response({'serializer':serializer.data,'token': token.key,
                                  'userid': user.id,'company':vv.company.name
             })
