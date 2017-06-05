@@ -32,6 +32,13 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
             return CompanyVendor.objects.get(pk=pk)
         except CompanyVendor.DoesNotExist:
             raise Http404
+    
+    def get_vendoradress_object(self, pk):
+        try:
+            return VendorAddress.objects.get(vendor_id=pk)
+        except CompanyVendor.DoesNotExist:
+            raise Http404
+    
         
     def get(self, request,*args, **kwargs):
         try:
@@ -98,15 +105,28 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
         return True
     
     def put(self, request,*args,**kwargs):
-        vendor_id = request.query_params['id']
-        vendor_obj = self.get_object(vendor_id)
-        if request.data:
-            obj = self.validate_params(request.data,vendor_obj)
-            if obj:
-                serializer = VendorSerializer(vendor_obj)
-                return Response({"result":serializer.data})
-
+        try:
+            vendor_id = request.query_params['id']
+            vendor_obj = self.get_object(vendor_id)
+            if request.data:
+                obj = self.validate_params(request.data,vendor_obj)
+                if obj:
+                    serializer = VendorSerializer(vendor_obj)
+                    return Response({"result":serializer.data})
+        except:
+            return Response({"result":"Invalid request"})
         return Response({"result":"Invalid request"})
+    
+    def delete(self,request,*args,**kwargs):
+        try:
+            vendor_id = request.query_params['id']
+            addr_obj = self.get_vendoradress_object(vendor_id)
+            addr_obj.delete()
+            vendor_obj = self.get_object(vendor_id)
+            vendor_obj.delete()
+            return Response({"result":"Successfully Deleted..!!"})
+        except:
+            return Response({"result":"Invalid request"})
         
 class ItemsAPI(AuthenticatedUserMixin,APIView):
     """
