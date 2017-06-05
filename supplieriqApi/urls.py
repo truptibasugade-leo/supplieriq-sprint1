@@ -10,4 +10,6 @@ urlpatterns = [
         name='item'),
     url(r'^runmatch', views.RunMatchAPI.as_view(),
         name='runmatch'),
+    url(r'^signin', views.SigninApi.as_view(),
+        name='signin'),
 ]

@@ -13,6 +13,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer
 from supplieriqmatch.utils import *
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import\
+    get_user_model, authenticate, login as auth_login, logout as auth_logout
 # Create your views here.
 
 class VendorsAPI(AuthenticatedUserMixin,APIView):
@@ -49,7 +52,15 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
         else:
             print serializer.errors
             return Response(serializer.errors)
+    
+    def put(self, request,*args,**kwargs):
+        import ipdb;ipdb.set_trace()
+        vendor_id = request.query_params['id']
+        obj = CompanyVendor.objects.get(id=vendor_id)
+        serializer = VendorSerializer(obj)    
 
+        return Response({"adh":"done"})
+    
 class ItemsAPI(AuthenticatedUserMixin,APIView):
     """
     This API is used to render template having Vendor list or 
@@ -84,6 +95,27 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
         else:
             print serializer.errors
             return Response(serializer.errors)
+
+class SigninApi(APIView):
+    
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = SignInSerializer 
+
+    @csrf_exempt
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)       
+        if serializer.is_valid():
+            user = serializer.instance            
+            token, created = Token.objects.get_or_create(user=user)  
+            new_user = authenticate(username=user.username, password=request.data.get('password'))
+            auth_login(request, new_user)
+            vv =request.user.usercompanymodel_set.first()
+            response = Response({'serializer':serializer.data,'token': token.key,
+                                 'userid': user.id,'company':vv.company.name
+            })
+        else:
+            response = Response({'errors':serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+        return response
 
 class SignInOutApi(APIView):
     pass
