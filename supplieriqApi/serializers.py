@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price, \
     FixedCost,VariableCost,ItemVendor,UserCompanyModel,PurchaseOrder,ItemReceipt
+from django.contrib.auth.models import User
+
 
 class CompanyApiSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
@@ -103,5 +105,56 @@ class ItemApiSerializer(serializers.ModelSerializer):
             'name', 'description','target_price', 'erp_item_code',
         )
     
+class SignInAPISerializer(serializers.ModelSerializer):
+
+    """
+    Purpose: To handle validations and populate sign in details.
+    Methods Supported: Get & Post.
+    """
+    email = serializers.EmailField(
+        required= True,
+        style={'placeholder': 'Email', 'autofocus': True}
+    )
+    password = serializers.CharField(
+        required= True,
+        style={'input_type': 'password', 'placeholder': 'Password'}
+    )
+
+    def validate(self, attrs):
+        """
+        Purpose: To validate signin serializers.
+        :param self: Context Object
+        :param attrs: Dictionary containing the key as field name & it's value
+        :param source: Field name
+        Constraints:
+        User account should be present and should be active.
+        :returns: attrs in case of valid inputs else error message
+        """
+        
+        try:
+            user = User.objects.get(email=attrs.get('email'))  
+
+            if user.check_password(attrs.get('password')):
+                self.instance = user
+            else:
+                error = "Invalid credentials. Note that both fields are case-sensitive."
+                raise serializers.ValidationError(error)                           
+        except:
+            error = "Invalid credentials. Note that both fields are case-sensitive."
+            raise serializers.ValidationError(error)
+            
+#         user = authenticate(email=attrs.get('email'),password=attrs.get('password'))
+#         if user is not None and user.is_active:
+#             self.instance = user
+#         else:
+#             error = "Invalid credentials. Note that both fields are case-sensitive."
+#             raise serializers.ValidationError(error)
+#             
+
+        return attrs
     
-     
+    class Meta(object):
+        model = User
+        fields = (
+            'email', 'password'
+        )

@@ -11,7 +11,7 @@ from supplieriqApi.utils import AuthenticatedUserMixin
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer
+from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer,SignInAPISerializer
 from supplieriqmatch.utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import\
@@ -108,7 +108,7 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
 class SigninApi(APIView):
     
     renderer_classes = (renderers.JSONRenderer,)
-    serializer_class = SignInSerializer 
+    serializer_class = SignInAPISerializer 
 
     @csrf_exempt
     def post(self, request, *args, **kwargs):
