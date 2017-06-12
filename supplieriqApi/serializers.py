@@ -2,6 +2,7 @@ from rest_framework import serializers
 from supplieriq.models import CompanyVendor,Company, CompanyItem, VendorAddress,Price, \
     FixedCost,VariableCost,ItemVendor,UserCompanyModel,PurchaseOrder,ItemReceipt
 from django.contrib.auth.models import User
+from django.http import Http404
 
 
 class CompanyApiSerializer(serializers.ModelSerializer):
@@ -74,10 +75,28 @@ class VendorApiSerializer(serializers.ModelSerializer):
 
 class ItemVendorApiSerializer(serializers.ModelSerializer):
     
+    companyitem = serializers.CharField(required=True)
+    companyendor = serializers.CharField(required=True)
+    
+    def get_vendor_object(self, pk):
+        try:
+            return CompanyVendor.objects.get(pk=pk)
+        except CompanyVendor.DoesNotExist:
+            return ""
+    
+    def create(self, vendors,item):
+        vendor_objs = []
+        for x in vendors: 
+            ob = self.get_vendor_object(vendors)
+            if ob:
+                if item.company == ob.company:
+                    obj = ItemVendor.objects.create(companyitem=item,companyvendor=ob)
+                    vendor_objs.append(obj)
+        return vendor_objs
     class Meta(object):
-        model = CompanyItem
+        model = ItemVendor
         fields = (
-            'name', 'description','target_price', 'erp_item_code',
+            'companyitem', 'companyvendor'
         )
     
 class ItemApiSerializer(serializers.ModelSerializer):
@@ -89,7 +108,7 @@ class ItemApiSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=True)
     target_price = serializers.CharField(required=True)
     erp_item_code = serializers.CharField(required=True)           
-
+    
     def create(self, validated_data,request):     
         
         ob = UserCompanyModel.objects.get(user=request.user)
@@ -97,8 +116,6 @@ class ItemApiSerializer(serializers.ModelSerializer):
         obj = CompanyItem.objects.create(**validated_data)        
         return obj        
         
-        return ''
-    
     class Meta(object):
         model = CompanyItem
         fields = (
