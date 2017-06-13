@@ -15,11 +15,11 @@ class AccountAdmin(admin.ModelAdmin):
     fields = ('account_no', 'license_key','expiry_date','company')
 
 class CompanyVendorAdmin(admin.ModelAdmin):
-    fields = ('name','email','phone','company','erp_vendor_code',)
+    fields = ('name','email','phone','company','erp_vendor_code','is_deleted')
     
 class CompanyItemAdmin(admin.ModelAdmin):
     
-    fields = ('name','erp_item_code','company','description','vendor','target_price')
+    fields = ('name','erp_item_code','company','description','vendor','target_price','is_deleted')
 
 class VendorAddressAdmin(admin.ModelAdmin):
     fields = ('address1','address2','vendor','city','state','country','zipcode','latitude','longitude')

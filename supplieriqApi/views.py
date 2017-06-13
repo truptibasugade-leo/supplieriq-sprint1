@@ -40,7 +40,6 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
         except CompanyVendor.DoesNotExist:
             raise Http404
     
-        
     def get(self, request,*args, **kwargs):
         try:
             erp_vendor_code = request.query_params['erp_vendor_code']
@@ -50,11 +49,11 @@ class VendorsAPI(AuthenticatedUserMixin,APIView):
                 serializer = VendorSerializer(obj)    
                 return Response(serializer.data)
             except:
-                return Response({"result":"Invalid request"})
+                return Response({"result":"Invalid request."})
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
-                queryset = CompanyVendor.objects.filter(company_id = objs.company_id)
+                queryset = CompanyVendor.objects.filter(company_id = objs.company_id,is_deleted=False)
             except:
                 queryset = CompanyVendor.objects.all()            
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
@@ -146,9 +145,9 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
     """
     renderer_classes = (renderers.JSONRenderer,)
     
-    def get_object(self, pk):
+    def get_object(self, erp_item_code,company):
         try:
-            return CompanyItem.objects.get(pk=pk)
+            return CompanyItem.objects.get(erp_item_code=erp_item_code,company=company,is_deleted=False)
         except CompanyItem.DoesNotExist:
             raise Http404
     
@@ -157,14 +156,17 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
             return ItemVendor.objects.filter(companyitem_id=item_id)
         except ItemVendor.DoesNotExist:
             raise Http404
-    
-    
+        
     def get(self, request,*args, **kwargs):
         try:
-            item_id = request.query_params['id']
-            obj = CompanyItem.objects.get(id=item_id)            
-            serializer = ItemSerializer(obj)    
-            return Response(serializer.data)
+            erp_item_code = request.query_params['erp_item_code']
+            try:
+                company= UserCompanyModel.objects.filter(user=request.user).first()
+                obj = CompanyItem.objects.get(erp_item_code=erp_item_code,company=company.company)            
+                serializer = ItemSerializer(obj)    
+                return Response(serializer.data)
+            except:
+                return Response({"result":"Invalid Request."})
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
@@ -180,22 +182,57 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
         if serializer.is_valid():
             data = serializer.data
             obj = serializer.create(serializer.validated_data,request)
-            xx = ItemVendorApiSerializer(data={'companyitem':obj.id,'companyvendor':request.data['vendor']})
-            xx.create(request.data['vendor'],obj)
-            data.update({'itemid':obj.id})
-            return Response(data)
+            try:
+                for vendor in request.data['vendor']:
+                    xx = ItemVendorApiSerializer(data={'companyitem':obj.id,'companyvendor':vendor})
+                    xx.create(vendor,obj)
+#                 data.update({'itemid':obj.id})
+                return Response(data)
+            except:
+                return Response({"result":"Vendor Does not exists.."})
         else:
             print serializer.errors
             return Response(serializer.errors)
         
+    def validate_params(self,request,item_obj):
+        if request.has_key('target_price'):
+            item_obj.target_price = int(request['target_price'])
+        if request.has_key('name'):
+            item_obj.name = request['name']
+        if request.has_key('description'):
+            item_obj.description = request['description']
+        if request.has_key('erp_item_code'):
+            item_obj.erp_item_code = int(request['erp_item_code'])
+        item_obj.save()
+        return True
+    
+    def put(self, request,*args,**kwargs):
+        try:
+            erp_item_code = request.query_params['erp_item_code']
+            company= UserCompanyModel.objects.filter(user=request.user).first()
+            item_obj = self.get_object(erp_item_code,company.company)
+            if request.data:
+                obj = self.validate_params(request.data,item_obj)
+                if obj:
+                    serializer = ItemApiSerializer(item_obj)
+                    return Response({"result":serializer.data})
+        except:
+            return Response({"result":"Invalid request"})
+        return Response({"result":"Invalid request"})
+      
     def delete(self,request,*args,**kwargs):
         try:
-            item_id = request.query_params['id']
-            itemvendor_objs = self.get_itemvendor_object(item_id)
-            for x in itemvendor_objs:
-                x.delete()
-            item_obj = self.get_object(item_id)
-            item_obj.delete()
+            erp_item_code = request.query_params['erp_item_code']
+            company= UserCompanyModel.objects.filter(user=request.user).first()
+            item_obj = self.get_object(erp_item_code,company.company)
+            try:
+                itemvendor_objs = self.get_itemvendor_object(item_obj.id)
+                for x in itemvendor_objs:
+                    x.delete()
+            except:
+                pass
+            item_obj.is_deleted = True
+            item_obj.save()
             return Response({"result":"Successfully Deleted..!!"})
         except:
             return Response({"result":"Invalid request"})

@@ -78,21 +78,21 @@ class ItemVendorApiSerializer(serializers.ModelSerializer):
     companyitem = serializers.CharField(required=True)
     companyendor = serializers.CharField(required=True)
     
-    def get_vendor_object(self, pk):
+    def get_vendor_object(self, erp_vendor_code,company):
         try:
-            return CompanyVendor.objects.get(pk=pk)
+            return CompanyVendor.objects.get(erp_vendor_code=erp_vendor_code,company=company)
         except CompanyVendor.DoesNotExist:
             return ""
     
-    def create(self, vendors,item):
-        vendor_objs = []
-        for x in vendors: 
-            ob = self.get_vendor_object(vendors)
-            if ob:
-                if item.company == ob.company:
-                    obj = ItemVendor.objects.create(companyitem=item,companyvendor=ob)
-                    vendor_objs.append(obj)
-        return vendor_objs
+    def create(self, vendor,item):
+    
+        ob = self.get_vendor_object(vendor,item.company)
+        if ob:       
+            obj = ItemVendor.objects.create(companyitem=item,companyvendor=ob)
+            return obj
+        else:
+            return ""
+        
     class Meta(object):
         model = ItemVendor
         fields = (
