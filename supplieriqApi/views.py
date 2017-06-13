@@ -225,12 +225,6 @@ class ItemsAPI(AuthenticatedUserMixin,APIView):
             erp_item_code = request.query_params['erp_item_code']
             company= UserCompanyModel.objects.filter(user=request.user).first()
             item_obj = self.get_object(erp_item_code,company.company)
-            try:
-                itemvendor_objs = self.get_itemvendor_object(item_obj.id)
-                for x in itemvendor_objs:
-                    x.delete()
-            except:
-                pass
             item_obj.is_deleted = True
             item_obj.save()
             return Response({"result":"Successfully Deleted..!!"})
