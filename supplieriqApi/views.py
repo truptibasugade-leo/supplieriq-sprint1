@@ -261,11 +261,14 @@ class RunMatchAPI(AuthenticatedUserMixin,APIView):
     def get(self, request,*args, **kwargs):   
         try:    
             cost = {}
-            item_id = request.query_params['item']            
+            erp_item_code = request.query_params['erp_item_code']            
             qty = request.query_params['quantity']      
 #             loc_id = request.query_params['company_address']      
 #             loc = Location.objects.get(id = loc_id)  
-#             lat1,long1 = get_lat_long(loc)    
+#             lat1,long1 = get_lat_long(loc) 
+            company= UserCompanyModel.objects.filter(user=request.user).first()
+            itemobj = CompanyItem.objects.filter(erp_item_code=erp_item_code,is_deleted=False,company=company.company).first()  
+            item_id = itemobj.id
             obj = ItemVendor.objects.filter(companyitem_id = item_id)
             qq = []
             for item in obj:   
@@ -276,7 +279,7 @@ class RunMatchAPI(AuthenticatedUserMixin,APIView):
                 try:
                     v_c = item.variablecost_set.all()
                 except:
-                    v_c= ''
+                    v_c = ''
                 fixed_cost = 0
                 variable_cost = 0
                 if f_c:

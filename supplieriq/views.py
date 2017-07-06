@@ -119,7 +119,7 @@ class VendorsAPI(APIView):
     def get(self, request,*args, **kwargs):
         try:
             vendor_id = request.query_params['id']
-            obj = CompanyVendor.objects.get(id=vendor_id)
+            obj = CompanyVendor.objects.get(id=vendor_id,is_deleted=False)
             serializer = VendorSerializer(obj)    
             return Response({'serializer':serializer.data},template_name="vendor/vendor_details.html")
         except:

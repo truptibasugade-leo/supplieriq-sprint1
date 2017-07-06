@@ -17,6 +17,7 @@ class MatchAPI(APIView):
     
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     def get(self, request,*args, **kwargs):   
+
         try:     
             cost = {}
             item_id = request.query_params['item']            
@@ -51,15 +52,17 @@ class MatchAPI(APIView):
                         
                         # find distance
                         v_addr = item.companyvendor.vendoraddress_set.first()
-                        lat2,long2 = get_lat_long(v_addr)                        
-                        if lat1 and long1 and lat2 and long2:
-                            dist = distance(lat1,long1,lat2,long2)
-                        else:
-                            if lat1=='' or long1=='':
-                                dist = 'Incorrect Company Address..!!'
+                        if v_addr:
+                            lat2,long2 = get_lat_long(v_addr)                        
+                            if lat1 and long1 and lat2 and long2:
+                                dist = distance(lat1,long1,lat2,long2)
                             else:
-                                dist = 'Incorrect Vendor Address..!!'
-                        
+                                if lat1=='' or long1=='':
+                                    dist = 'Incorrect Company Address..!!'
+                                else:
+                                    dist = 'Incorrect Vendor Address..!!'
+                        else:
+                            dist='Address Not Present.'
                         zz = serializer.data                    
                         zz.update({"total price":float(total)})
                         zz.update({"distance":dist})
