@@ -125,7 +125,7 @@ class VendorsAPI(APIView):
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
-                queryset = CompanyVendor.objects.filter(company_id = objs.company_id)
+                queryset = CompanyVendor.objects.filter(company_id = objs.company_id,is_deleted=False)
             except:
                 queryset = CompanyVendor.objects.all()            
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
@@ -156,13 +156,13 @@ class ItemsAPI(APIView):
     def get(self, request,*args, **kwargs):
         try:            
             item_id = request.query_params['id']
-            obj = CompanyItem.objects.get(id=item_id)            
+            obj = CompanyItem.objects.get(id=item_id,is_deleted=False)            
             serializer = ItemSerializer(obj)  
             return Response({'serializer':serializer.data},template_name="item/item_details.html")
         except:
             try:
                 objs= UserCompanyModel.objects.filter(user=request.user).first()
-                queryset = CompanyItem.objects.filter(company_id = objs.company_id)
+                queryset = CompanyItem.objects.filter(company_id = objs.company_id,is_deleted=False)
             except:
                 queryset = CompanyItem.objects.all()
             renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)

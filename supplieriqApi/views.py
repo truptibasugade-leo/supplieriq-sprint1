@@ -287,7 +287,7 @@ class RunMatchAPI(AuthenticatedUserMixin,APIView):
                 if v_c:
                     variable_cost = calculate_variable_cost(qty,v_c)
 
-                if variable_cost != 0 and fixed_cost != 0:
+                if variable_cost != 0 and fixed_cost != 0 and item.companyvendor.is_deleted == False:
                     zzzz=request.user.usercompanymodel_set.all()
                     qqq =zzzz[0]
                     if qqq.company == item.companyvendor.company:

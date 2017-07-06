@@ -80,7 +80,7 @@ class ItemVendorApiSerializer(serializers.ModelSerializer):
     
     def get_vendor_object(self, erp_vendor_code,company):
         try:
-            return CompanyVendor.objects.get(erp_vendor_code=erp_vendor_code,company=company)
+            return CompanyVendor.objects.get(erp_vendor_code=erp_vendor_code,company=company,is_deleted=False)
         except CompanyVendor.DoesNotExist:
             return ""
     
