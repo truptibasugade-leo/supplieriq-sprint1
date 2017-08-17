@@ -34,6 +34,7 @@ from django.conf import settings
 from django.core.mail.message import EmailMessage
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseRedirect
 
 class ObtainAuthToken(APIView):
 
@@ -290,12 +291,14 @@ class RunMatchAPI(APIView):
             cost[ 'Total']=float(total)
             return Response(json.dumps(cost))
         except:
-            zzzz=request.user.usercompanymodel_set.all()
-            company_address = zzzz[0].company.location_set.all()
-            qqq =zzzz[0]
-            queryset = CompanyItem.objects.filter(company=qqq.company)
-            return Response({'serializer':queryset,'company_address':company_address},template_name="run_match.html")
-
+            try:
+                zzzz=request.user.usercompanymodel_set.all()
+                company_address = zzzz[0].company.location_set.all()
+                qqq =zzzz[0]
+                queryset = CompanyItem.objects.filter(company=qqq.company)
+                return Response({'serializer':queryset,'company_address':company_address},template_name="run_match.html")
+            except:
+                return HttpResponseRedirect("/")
 class QuoteAPI(APIView):
     renderer_classes = (renderers.JSONRenderer,TemplateHTMLRenderer)
     
@@ -337,7 +340,7 @@ class QuoteAPI(APIView):
             except:
                 return Response({'serializer':'Unauthorized..!! You cannot access this link.','status':'unauthorized'},template_name="update_cost.html")
             serializer = CostSerializer(obj)
-            return Response({'serializer':serializer.data,'vendor_id':obj.companyvendor_id,'item_id':obj.companyitem_id},template_name="update_cost.html")
+            return Response({'serializer':serializer.data,'vendor_name':obj.companyvendor.name,'item_name':obj.companyitem.name},template_name="update_cost.html")
 
 class PurchaseOrderAPI(APIView):
     """

@@ -175,3 +175,26 @@ class SignInAPISerializer(serializers.ModelSerializer):
         fields = (
             'email', 'password'
         )
+        
+class SupplierIQCompanyAPISerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(required=True)
+    supplieriq_id = serializers.CharField(required=True)
+    
+    def validate(self, attrs):
+        try:
+            data = Company.objects.get(supplieriq_id=attrs.get('supplieriq_id'))
+        except:
+            data = attrs
+        return data
+        
+    def create(self, validated_data,request):     
+        
+        obj = Company.objects.create(**validated_data)        
+        return obj        
+    
+    class Meta(object):
+        model = Company
+        fields = (
+            'name', 'supplieriq_id',
+        )

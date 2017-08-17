@@ -1,5 +1,11 @@
 from django.http import QueryDict
- 
+        
+from datetime import datetime, timedelta
+from django.conf import settings
+from django.contrib import auth
+from django.http import HttpResponse, HttpResponseRedirect
+
+
 class HttpPostTunnelingMiddleware(object):
     def process_request(self, request):
         if request.META.has_key('HTTP_X_METHODOVERRIDE'):
@@ -17,3 +23,18 @@ class HttpPostTunnelingMiddleware(object):
 class DisableCSRF(object):
     def process_request(self, request):
         setattr(request, '_dont_enforce_csrf_checks', True)
+
+class AutoLogout:
+    
+    def process_request(self, request):
+        try:
+            last_activity =datetime.strptime(request.session['last_touch'], "%Y-%m-%d %H:%M:%S.%f")
+
+            if datetime.now() - last_activity > timedelta( 0, settings.AUTO_LOGOUT_DELAY , 0):
+                auth.logout(request)
+#                 del request.session['last_touch']
+                return HttpResponseRedirect("/")
+        except KeyError:
+            pass
+    
+        request.session['last_touch'] = str(datetime.now())

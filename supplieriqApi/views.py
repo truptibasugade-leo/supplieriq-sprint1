@@ -11,13 +11,15 @@ from supplieriqApi.utils import AuthenticatedUserMixin
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer,SignInAPISerializer
+from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer,SignInAPISerializer,SupplierIQCompanyAPISerializer
 from supplieriqmatch.utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import\
     get_user_model, authenticate, login as auth_login, logout as auth_logout
 from django.http import Http404
 from django.core import serializers
+from django.http import HttpResponse
+import json
 # Create your views here.
 
 class VendorsAPI(AuthenticatedUserMixin,APIView):
@@ -325,3 +327,47 @@ class RunMatchAPI(AuthenticatedUserMixin,APIView):
         except:
             return Response({'result':'No Results Found'})
 
+
+class SupplierIQCompanyApi(APIView):
+    
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = SupplierIQCompanyAPISerializer 
+    
+    
+    def get(self, request, *args, **kwargs):
+        if request.data["call"] == "get":
+            serializer = self.serializer_class(data=request.data)       
+            if serializer.is_valid():
+                try:
+                    if serializer.validated_data.id:
+                        if serializer.validated_data.is_deleted == False:
+                            
+                            response = Response(json.dumps({"result":"Added"}))
+                        else:
+                            
+                            response = Response(json.dumps({"result":"Deleted"}))
+                except:
+                    
+                    response = Response(json.dumps({"result":"DoesNotExists"}))
+            else:
+                response = Response({"errors":serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+            return response
+
+        else:
+            serializer = self.serializer_class(data=request.data)       
+            if serializer.is_valid():
+                try:
+                    if serializer.validated_data.id:
+                        if serializer.validated_data.is_deleted == False:
+                            serializer.validated_data.is_deleted = True
+                            response = Response(json.dumps({"result":"Deleted"}))
+                        else:
+                            serializer.validated_data.is_deleted = False
+                            response = Response(json.dumps({"result":"Added"}))
+                        serializer.validated_data.save()
+                except:
+                    obj = serializer.create(serializer.validated_data,request)
+                    response = Response(json.dumps({"result":"Created"}))
+            else:
+                response = Response({"errors":serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+            return response

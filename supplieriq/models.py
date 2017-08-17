@@ -18,6 +18,8 @@ class Company(models.Model):
     # Common Information
     name = models.CharField(max_length=256, null=True, blank=True)
     address = models.CharField(max_length=256, null=True, blank=True)
+    supplieriq_id = models.CharField(max_length=256,null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
 

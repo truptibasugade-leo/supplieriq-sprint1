@@ -12,4 +12,7 @@ urlpatterns = [
         name='runmatch'),
     url(r'^signin', views.SigninApi.as_view(),
         name='signin'),
+    url(r'^add_company_to_purchasesmart', views.SupplierIQCompanyApi.as_view(),
+        name='add_company_to_purchasesmart'),
+
 ]
