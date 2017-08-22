@@ -11,7 +11,9 @@ from supplieriqApi.utils import AuthenticatedUserMixin
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,ItemVendorApiSerializer,SignInAPISerializer,SupplierIQCompanyAPISerializer
+from supplieriqApi.serializers import VendorApiSerializer,VendorAddressSerializer,ItemApiSerializer,\
+    ItemVendorApiSerializer,SignInAPISerializer,SupplierIQCompanyAPISerializer,SupplierIQVendorAPISerializer,\
+    SupplierIQVendorAddressSerializer
 from supplieriqmatch.utils import *
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import\
@@ -333,7 +335,6 @@ class SupplierIQCompanyApi(APIView):
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = SupplierIQCompanyAPISerializer 
     
-    
     def get(self, request, *args, **kwargs):
         if request.data["call"] == "get":
             serializer = self.serializer_class(data=request.data)       
@@ -371,3 +372,56 @@ class SupplierIQCompanyApi(APIView):
             else:
                 response = Response({"errors":serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
             return response
+
+class SupplierIQVendorApi(APIView):
+    
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = SupplierIQVendorAPISerializer 
+    
+    def get(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)       
+        if serializer.is_valid():
+            try:
+                if serializer.validated_data.id:
+                    if serializer.validated_data.is_deleted == False:                        
+                        response = Response(json.dumps({"result":"Added"}))
+                    else:                        
+                        response = Response(json.dumps({"result":"Deleted"}))
+            except:                
+                response = Response(json.dumps({"result":"DoesNotExists"}))
+        else:
+            response = Response({"errors":serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+        return response
+
+    def post(self,request,*args, **kwargs):
+        query_data = dict(request.data)
+        company = query_data.pop('company_id')
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():  
+            try:
+                if serializer.validated_data.id:
+                    if serializer.validated_data.is_deleted == False:
+                        serializer.validated_data.is_deleted = True
+                        response = Response(json.dumps({"result":"Deleted"}))
+                    else:
+                        serializer.validated_data.is_deleted = False
+                        response = Response(json.dumps({"result":"Added"}))
+                    serializer.validated_data.save()
+            except:          
+                data = serializer.data
+                obj = serializer.create(serializer.validated_data,company[0])
+                if obj == "Link the Company first with Purchase Smart.":
+                    response = Response(json.dumps({"result":"Link the Company first with Purchase Smart."}))
+                else:
+                    address_set = [{"address1":query_data["address1"][0],"address2":query_data["address2"][0],\
+                                    "city":query_data["city"][0],"state":query_data["state"][0],\
+                                    "country":query_data["country"][0],"zipcode":query_data["zipcode"][0],\
+                                   "longitude":query_data["longitude"][0],"latitude":query_data["latitude"][0],}]
+                    xx = SupplierIQVendorAddressSerializer(data= address_set)
+                    addr_obj = xx.create(address_set,obj)
+                    response = Response(json.dumps({"result":"Created"}))
+#             data.update({'vendorid':obj.id})
+            
+        else:
+            response = Response({"errors":serializer.errors, 'status':status.HTTP_400_BAD_REQUEST})
+        return response

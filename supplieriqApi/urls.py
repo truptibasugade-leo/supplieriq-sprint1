@@ -14,5 +14,6 @@ urlpatterns = [
         name='signin'),
     url(r'^add_company_to_purchasesmart', views.SupplierIQCompanyApi.as_view(),
         name='add_company_to_purchasesmart'),
-
+    url(r'^add_vendor_to_purchasesmart', views.SupplierIQVendorApi.as_view(),
+        name='add_vendor_to_purchasesmart'),
 ]

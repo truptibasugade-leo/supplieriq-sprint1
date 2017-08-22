@@ -198,3 +198,67 @@ class SupplierIQCompanyAPISerializer(serializers.ModelSerializer):
         fields = (
             'name', 'supplieriq_id',
         )
+        
+class SupplierIQVendorAPISerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(required=True)
+    phone = serializers.CharField(required=True) 
+    supplieriq_vendor_id = serializers.CharField(required=True)   
+    address_set = VendorAddressSerializer(many=True)
+    
+    def validate(self, attrs):
+        try:
+            data = CompanyVendor.objects.get(supplieriq_vendor_id=attrs.get('supplieriq_vendor_id'))
+        except:
+            data = attrs
+        return data
+    
+    def create(self, validated_data,company):        
+        validated_data.pop("address_set")
+        try:
+            ob = Company.objects.get(supplieriq_id=company)
+            if ob.is_deleted == False:
+                validated_data.update({"company":ob})
+                obj = CompanyVendor.objects.create(**validated_data)        
+                return obj
+            else:
+                return "Link the Company first with Purchase Smart."                        
+        except:
+            return "Link the Company first with Purchase Smart."
+        
+
+    class Meta(object):
+        model = CompanyVendor
+        fields = (
+            'name', 'phone','supplieriq_vendor_id','address_set',
+        )
+
+class SupplierIQVendorAddressSerializer(serializers.ModelSerializer):
+     
+    address1 = serializers.CharField(required=True)
+ 
+    address2 = serializers.CharField()
+ 
+    city = serializers.CharField(required=True)
+ 
+    state = serializers.CharField(required=True)
+ 
+    country = serializers.CharField(required=True)
+ 
+    zipcode = serializers.CharField(required=True)
+    
+    latitude = serializers.CharField(required=True)
+    
+    longitude = serializers.CharField(required=True)
+    
+    def create(self, validated_data,obj):
+        vv =validated_data[0]
+        vv.update({"vendor":obj})
+        ob = VendorAddress.objects.create(**vv)
+        return ob
+    
+    class Meta(object):
+        model = VendorAddress
+        fields = (
+            'address1','address2', 'city','state','country','zipcode','latitude','longitude'
+        ) 

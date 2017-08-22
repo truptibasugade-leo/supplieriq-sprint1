@@ -46,9 +46,11 @@ class CompanyVendor(models.Model):
     phone = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(max_length=254, blank=True)
     erp_vendor_code = models.CharField(max_length=256, null=True, blank=True)
+    supplieriq_vendor_id = models.CharField(max_length=256,null=True, blank=True)
     send_quote_id = models.CharField(max_length=100, blank=True, default=uuid.uuid4)
     link_expiration_date = models.DateTimeField(default=datetime.now)
     is_deleted = models.BooleanField(default=False)
+    
     
     def __unicode__(self):
         return "Company : "+self.company.name+", Vendor : "+self.name
