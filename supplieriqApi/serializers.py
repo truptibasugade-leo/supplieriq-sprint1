@@ -206,9 +206,10 @@ class SupplierIQVendorAPISerializer(serializers.ModelSerializer):
     supplieriq_vendor_id = serializers.CharField(required=True)   
     address_set = VendorAddressSerializer(many=True)
     
+    
     def validate(self, attrs):
         try:
-            data = CompanyVendor.objects.get(supplieriq_vendor_id=attrs.get('supplieriq_vendor_id'))
+            data = CompanyVendor.objects.filter(supplieriq_vendor_id=attrs.get('supplieriq_vendor_id'))
         except:
             data = attrs
         return data
