@@ -340,7 +340,9 @@ class QuoteAPI(APIView):
             except:
                 return Response({'serializer':'Unauthorized..!! You cannot access this link.','status':'unauthorized'},template_name="update_cost.html")
             serializer = CostSerializer(obj)
-            return Response({'serializer':serializer.data,'vendor_name':obj.companyvendor.name,'item_name':obj.companyitem.name},template_name="update_cost.html")
+            return Response({'serializer':serializer.data,'vendor_name':obj.companyvendor.name,\
+                             'vendor_id':obj.companyvendor.id,'item_name':obj.companyitem.name,\
+                             'item_id':obj.companyitem.id,},template_name="update_cost.html")
 
 class PurchaseOrderAPI(APIView):
     """
