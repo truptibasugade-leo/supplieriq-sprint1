@@ -378,12 +378,23 @@ class SupplierIQVendorApi(APIView):
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = SupplierIQVendorAPISerializer 
     
+    def check_if_obj_exists(self,obj,company):
+        aa = []
+        try:
+            for x in obj:
+                if x.company.supplieriq_id == company:
+                    aa.append(x)
+                
+            return aa[0]
+        except:
+            return "NA"
     def get(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)       
         if serializer.is_valid():
             try:
-                if serializer.validated_data.id:
-                    if serializer.validated_data.is_deleted == False:                        
+                result = self.check_if_obj_exists(serializer.validated_data,request.data['company_id'])
+                if result.id:
+                    if result.is_deleted == False and result.company.supplieriq_id == request.data['company_id']:                        
                         response = Response(json.dumps({"result":"Added"}))
                     else:                        
                         response = Response(json.dumps({"result":"Deleted"}))
@@ -397,16 +408,18 @@ class SupplierIQVendorApi(APIView):
         query_data = dict(request.data)
         company = query_data.pop('company_id')
         serializer = self.serializer_class(data=request.data)
+
         if serializer.is_valid():  
             try:
-                if serializer.validated_data.id:
-                    if serializer.validated_data.is_deleted == False:
-                        serializer.validated_data.is_deleted = True
+                result = self.check_if_obj_exists(serializer.validated_data,company[0])
+                if result.id:
+                    if result.is_deleted == False and result.company.supplieriq_id == company[0]:
+                        result.is_deleted = True
                         response = Response(json.dumps({"result":"Deleted"}))
                     else:
-                        serializer.validated_data.is_deleted = False
+                        result.is_deleted = False
                         response = Response(json.dumps({"result":"Added"}))
-                    serializer.validated_data.save()
+                    result.save()
             except:          
                 data = serializer.data
                 obj = serializer.create(serializer.validated_data,company[0])
